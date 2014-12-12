@@ -1,0 +1,98 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<polymer-element name="th-lens-node" attributes="type input output componentId">
+  <core-style ref="theme"></theme>
+  <template>
+    <style>
+      #node{
+        width: 80%;
+        min-height: 100px;
+        background-color: white;
+        margin: 0 auto 100px auto;
+        box-sizing: border-box;
+        padding: 0;
+      }
+
+      .connector {
+        height: 100px;
+        box-sizing: border-box;
+        position: relative;
+        left: 50%;
+        bottom: -100px;
+        width: 2px;
+        border: 1px solid white;
+      }
+
+      .add-button {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: black;
+        position: absolute;
+        top: 40px;
+        left: -10px;
+        color: white;
+        text-align: center;
+        cursor: pointer;
+      }
+
+      .section {
+        width: 33.34%;
+        display: inline-block;
+        position: relative;
+        float: left;
+        border-right: 2px solid #eee;
+        box-sizing: border-box;
+        height: 100%;
+        min-height: 100px;
+      }
+
+      .delete-button {
+        position: relative;
+        float: right;
+        margin-right: 3px;
+        cursor: pointer;
+      }
+    </style>
+    <div id="node">
+      <span class="delete-button" on-click="{{deleteNode}}">x</span>
+      <template if="{{type=='input'}}">
+        <content></content>
+        <div class="connector"><div class="add-button">+</div></div>
+      </template>
+
+
+      <template if="{{type=='edit'}}">
+        <div class="section"></div>
+        <div class="section"> <content></content></div>
+        <div class="section"></div>
+        <div class="connector"><div class="add-button" on-click="{{addNode}}">+</div></div> 
+      </template>
+
+      <template if="{{type=='visualize'}}">
+        <content></content>
+      </template>
+      
+    </div>
+  </template>
+
+  <script>
+
+      Polymer('th-lens-node', {
+        ready: function(){
+          var self = this;
+          
+        },
+        addNode: function(){
+          var self = this;
+          
+          self.parentNode.parentNode.host._addNode();
+        },
+        deleteNode: function(){
+          // call deleteNode in lens composer, passing the correct index/id of 'this'
+        }
+        
+      });
+
+  </script>
+</polymer-element>
