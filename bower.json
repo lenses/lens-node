@@ -4,7 +4,8 @@
   "keywords": "seed, polymer, web-components",
   "main": "th-lens-node",
   "dependencies": {
-    "polymer": "Polymer/polymer#~0.5.1"
+    "polymer": "Polymer/polymer#~0.5.1",
+    "th-data-table": "thelmanews/th-data-table"
     
   }
 }
