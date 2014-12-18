@@ -4,6 +4,7 @@
 <link rel="import" href="../core-item/core-item.html">
 <link rel="import" href="../core-icon-button/core-icon-button.html">
 <link rel="import" href="../core-icons/core-icons.html">
+<link rel="import" href="../core-collapse/core-collapse.html">
 
 
 <polymer-element name="th-lens-node" attributes="input output componentList type">
@@ -12,17 +13,23 @@
     <style>
       #node{
         width: 100%;
-        min-height: 100px;
+        /*min-height: 100px;*/
         background-color: white;
         margin: 0 auto;
         box-sizing: border-box;
         padding: 0;
         border: 3px solid #eee;
+        border-radius: 5px;
       }
 
       #select, #transform {
-        min-height: 200px;
+        /*min-height: 200px;*/
         border-bottom: 3px solid #eee;
+        padding: 5px;
+      }
+
+      #view {
+        padding: 5px;
       }
 
       core-item::shadow #label{
@@ -36,20 +43,33 @@
       
       <!-- Input node -->
       <template if="{{type=='input'}}">
-        <content id="component"></content>
+        <div id="view">
+          Enter Data: <core-icon icon="menu" data-target="collapse-view" on-click="{{toggle}}"></core-icon>
+          <core-collapse id="collapse-view" opened>
+            <content id="component"></content>
+          </core-collapse>
+        </div>
       </template>
 
       <!-- Transform node -->
       <template if="{{type=='transform'}}">
         <div id="select">
-          Select Data:
-          <!-- show a datatable with input, with the entire selection made -->
-          <th-data-table id="inputTable" input="{{input}}" output="{{componentInput}}"></th-data-table>
+          Select Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
+          <core-collapse id="collapse-select">
+            <th-data-table id="inputTable" input="{{input}}" output="{{componentInput}}"></th-data-table>
+          </core-collapse>
         </div>
         
         <div id="transform">
-          Transform:
-            <!-- Show menu of components to choose from -->
+          Transform:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-transform"></core-icon>
+          <!-- Name of component selected -->
+          <template if="{{component}}">
+            <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
+          </template>
+
+          <!-- *** Collapsible *** -->
+          <core-collapse id="collapse-transform">
+            <!-- Menu of components to choose from -->
             <template if="{{!component}}">
               <core-menu id="component-list">
                   <core-item class="core-selected" label="None"></core-item>
@@ -59,47 +79,55 @@
               </core-menu>
             </template>
 
-            <!-- Name of component selected -->
-            <template if="{{component}}">
-              <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
-            </template>
-
             <!-- Component itself -->
             <content id="component"></content>
+          </core-collapse>
+          <!-- ***** -->
+
         </div>
         
         <div id="view">
-          View Result (read only)
+          View Result (read only)<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-view"></core-icon>
+          <core-collapse id="collapse-view">
             <th-data-table id="outputTable" output="{{componentOutput}}" readOnly="true"></th-data-table>
-          <!-- show a datatable with output -->
+          </core-collapse>
         </div>
       </template>
 
       <!-- Visual node -->
       <template if="{{type=='visualize'}}">
-                <div id="select">
-          Select Data:
-          <!-- show a datatable with input, with the entire selection made -->
-          <th-data-table id="inputTable" input="{{input}}" output="{{componentInput}}"></th-data-table>
+        <div id="select">
+          Select Data:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-select"></core-icon>
+          
+          <core-collapse id="collapse-select">
+            <th-data-table id="inputTable" input="{{input}}" output="{{componentInput}}"></th-data-table>
+          </core-collapse>
         </div>
-        <!-- Show menu of components to choose from -->
-        <template if="{{!component}}">
-          Choose a visual:
-          <core-menu id="component-list">
-              <core-item class="core-selected" label="None"></core-item>
-            <template repeat="{{component in componentList | filterByType}}">
-              <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
-            </template>
-          </core-menu>
-        </template>
-        
-        <!-- Name of component selected -->
-        <template if="{{component}}">
-          <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
-        </template>
 
-        <!-- Component itself -->
-        <content id="component"></content>
+        <div id="view">
+          Choose a visual:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-view"></core-icon>
+          <!-- Name of component selected -->
+          <template if="{{component}}">
+            <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
+          </template>
+          
+          <core-collapse id="collapse-view">
+            <template if="{{!component}}">  
+              <!-- Menu of components to choose from -->
+              <core-menu id="component-list">
+                  <core-item class="core-selected" label="None"></core-item>
+                <template repeat="{{component in componentList | filterByType}}">
+                  <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
+                </template>
+              </core-menu>
+            </template>
+          
+
+
+            <!-- Component itself -->
+            <content id="component"></content>
+          </core-collapse>
+        </div>
       </template>
       
     </div>
@@ -199,6 +227,12 @@
         var self = this;
         var componentList = value.filter(function(component){ return component.type == self.type });
         return componentList;
+      },
+      toggle: function(e, detail, selection){
+        var self = this;
+        var target = selection.dataset.target;        
+        self.shadowRoot.querySelector('#'+target).toggle();
+        // this.$.collapse.toggle();
       }
         
       });
