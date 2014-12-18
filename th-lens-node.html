@@ -1,5 +1,10 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../th-data-table/th-data-table.html">
+<link rel="import" href="../core-menu/core-menu.html">
+<link rel="import" href="../core-item/core-item.html">
+<link rel="import" href="../core-icon-button/core-icon-button.html">
+<link rel="import" href="../core-icons/core-icons.html">
+
 
 <polymer-element name="th-lens-node" attributes="input output componentList type">
   <core-style ref="theme"></theme>
@@ -12,12 +17,12 @@
         margin: 0 auto;
         box-sizing: border-box;
         padding: 0;
-        border: 2px solid #eee;
+        border: 3px solid #eee;
       }
 
-      #select, #transform, #view {
+      #select, #transform {
         min-height: 200px;
-        border: 2px solid #eee;
+        border-bottom: 3px solid #eee;
       }
 
       core-item::shadow #label{
@@ -28,7 +33,7 @@
     </style>
     <div id="node">
       <!-- Common among all nodes -->
-      <!-- <span class="delete-button" on-click="{{deleteNode}}">x</span> -->
+      
       <!-- Input node -->
       <template if="{{type=='input'}}">
         <content id="component"></content>
@@ -48,29 +53,52 @@
             <template if="{{!component}}">
               <core-menu id="component-list">
                   <core-item class="core-selected" label="None"></core-item>
-                <template repeat="{{component in componentList}}">
+                <template repeat="{{component in componentList | filterByType}}">
                   <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
                 </template>
               </core-menu>
             </template>
 
+            <!-- Name of component selected -->
             <template if="{{component}}">
               <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
             </template>
 
+            <!-- Component itself -->
             <content id="component"></content>
         </div>
         
         <div id="view">
-          View
-            <th-data-table id="outputTable" output="{{componentOutput}}" ></th-data-table>
+          View Result:
+            <th-data-table id="outputTable" output="{{componentOutput}}" readOnly="true"></th-data-table>
           <!-- show a datatable with output -->
         </div>
       </template>
 
       <!-- Visual node -->
       <template if="{{type=='visual'}}">
-        <!-- this could have multiple components, each would get its own menu/select table, they are divided by tabs -->
+                <div id="select">
+          Select Data:
+          <!-- show a datatable with input, with the entire selection made -->
+          <th-data-table id="inputTable" input="{{input}}" output="{{componentInput}}"></th-data-table>
+        </div>
+        <!-- Show menu of components to choose from -->
+        <template if="{{!component}}">
+          Choose a visual:
+          <core-menu id="component-list">
+              <core-item class="core-selected" label="None"></core-item>
+            <template repeat="{{component in componentList | filterByType}}">
+              <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
+            </template>
+          </core-menu>
+        </template>
+        
+        <!-- Name of component selected -->
+        <template if="{{component}}">
+          <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
+        </template>
+
+        <!-- Component itself -->
         <content id="component"></content>
       </template>
       
@@ -86,7 +114,9 @@
 
       componentList: [
           {name:'th-array-function', friendly: 'Map/Reduce/Filter Functions', type: 'transform'},
-          {name:'th-geocoder-firebase', friendly: 'Geocode Data', type: 'transform'}
+          {name:'th-geocoder-firebase', friendly: 'Geocode Data', type: 'transform'},
+          {name:'th-google-map', friendly: 'Google Map', type: 'visual'},
+          {name:'th-n-bar-chart', friendly: 'Bar Chart', type: 'visual'}
       ],
       domReady: function() {
         var self = this;
@@ -164,6 +194,11 @@
         if (self.type == 'visual'){
           self.componentInput = self.input;
         }
+      },
+      filterByType: function(value){
+        var self = this;
+        var componentList = value.filter(function(component){ return component.type == self.type });
+        return componentList;
       }
         
       });
