@@ -1,76 +1,76 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../th-data-table/th-data-table.html">
 
-<polymer-element name="th-lens-node" attributes="type input output componentId">
+<polymer-element name="th-lens-node" attributes="input output componentList type">
   <core-style ref="theme"></theme>
   <template>
     <style>
       #node{
-        width: 80%;
+        width: 100%;
         min-height: 100px;
         background-color: white;
-        margin: 0 auto 100px auto;
+        margin: 0 auto;
         box-sizing: border-box;
         padding: 0;
       }
 
-      .connector {
-        height: 100px;
-        box-sizing: border-box;
-        position: relative;
-        left: 50%;
-        bottom: -100px;
-        width: 2px;
-        border: 1px solid white;
+      #select, #transform, #view {
+        min-height: 200px;
+        border: 2px solid #eee;
       }
 
-      .add-button {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: black;
-        position: absolute;
-        top: 40px;
-        left: -10px;
-        color: white;
-        text-align: center;
-        cursor: pointer;
-      }
-
-      .section {
-        width: 33.34%;
-        display: inline-block;
-        position: relative;
-        float: left;
-        border-right: 2px solid #eee;
-        box-sizing: border-box;
-        height: 100%;
-        min-height: 100px;
-      }
-
-      .delete-button {
-        position: relative;
-        float: right;
-        margin-right: 3px;
+      core-item::shadow #label{
+        padding: 5px;
+        background-color: #ddd;
         cursor: pointer;
       }
     </style>
     <div id="node">
-      <span class="delete-button" on-click="{{deleteNode}}">x</span>
+      <!-- Common among all nodes -->
+      <!-- <span class="delete-button" on-click="{{deleteNode}}">x</span> -->
+      <!-- Input node -->
       <template if="{{type=='input'}}">
-        <content></content>
-        <div class="connector"><div class="add-button">+</div></div>
+        <content id="component"></content>
       </template>
 
+      <!-- Transform node -->
+      <template if="{{type=='transform'}}">
+        <div id="select">
+          Select Data:
+          <!-- show a datatable with input, with the entire selection made -->
+          <th-data-table id="inputTable" input="{{input}}" output="{{componentInput}}"></th-data-table>
+        </div>
+        
+        <div id="transform">
+          Transform:
+            <!-- Show menu of components to choose from -->
+            <template if="{{!component}}">
+              <core-menu id="component-list">
+                  <core-item class="core-selected" label="None"></core-item>
+                <template repeat="{{component in componentList}}">
+                  <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
+                </template>
+              </core-menu>
+            </template>
 
-      <template if="{{type=='edit'}}">
-        <div class="section"></div>
-        <div class="section"> <content></content></div>
-        <div class="section"></div>
-        <div class="connector"><div class="add-button" on-click="{{addNode}}">+</div></div> 
+            <template if="{{component}}">
+              <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
+            </template>
+
+            <content id="component"></content>
+        </div>
+        
+        <div id="view">
+          View
+            <th-data-table id="outputTable" output="{{componentOutput}}" ></th-data-table>
+          <!-- show a datatable with output -->
+        </div>
       </template>
 
-      <template if="{{type=='visualize'}}">
-        <content></content>
+      <!-- Visual node -->
+      <template if="{{type=='visual'}}">
+        <!-- this could have multiple components, each would get its own menu/select table, they are divided by tabs -->
+        <content id="component"></content>
       </template>
       
     </div>
@@ -79,18 +79,91 @@
   <script>
 
       Polymer('th-lens-node', {
-        ready: function(){
+      componentInput: [],
+      componentOutput: [],
+      type: 'transform',
+
+      componentList: [
+          {name:'th-array-function', friendly: 'Map/Reduce/Filter Functions', type: 'transform'},
+          {name:'th-geocoder-firebase', friendly: 'Geocode Data', type: 'transform'}
+      ],
+      domReady: function() {
+        var self = this;
+        this.component = this.$.component.getDistributedNodes()[1];
+        console.log(this.component);
+
+        
+      },
+      componentInputChanged: function(){
           var self = this;
-          
-        },
-        addNode: function(){
-          var self = this;
-          
-          self.parentNode.parentNode.host._addNode();
-        },
-        deleteNode: function(){
-          // call deleteNode in lens composer, passing the correct index/id of 'this'
+          console.log("component input changed");
+          console.log(self.componentInput);
+
+          if (self.componentInput.length > 0){
+            if(self.component){
+              self.component.input = self.componentInput;
+            } else {
+              console.log("output table input changed");
+              self.$.outputTable.input = self.componentInput;
+              console.log(self.componentInput);
+            }
+            // console.log("******");
+            // console.log(self.componentInput)
+            // self.component.input = self.componentInput;
+          }
+      },
+      componentOutputChanged: function(){
+        var self = this;
+        self.output = self.componentOutput;
+      },
+      addElement: function(e, detail, selection){
+        var self = this;
+        self.component = document.createElement(selection.className);
+        self.appendChild(self.component);
+        
+        self.componentName = self.component.tagName.toLowerCase();
+        self.setObservers();
+      },
+      removeElement: function(e, detail, selection){
+        var self = this;
+        self.removeChild(self.component);
+        self.component = null;
+        
+      },
+      setObservers: function(){
+        var self = this;
+
+        // Observes changes in the output of the first table, which is the component input
+        var componentInputObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
+          self.component.input = newValue;
+        });
+
+        // Observes changes in the output of the component, which is the data in the view table
+        var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
+          self.$.outputTable.input = self.component ? self.component.output : self.componentInput;            
+        })
+
+
+
+        // TODO: when transform component changes, view table should reflect that
+        // TODO: transformed data should be appended to original data
+
+      },
+      componentChanged: function(){
+        var self = this;
+        if (self.component){
+          self.component.input = self.componentInput;
+          self.$.outputTable.input = self.component.output;
+        } else {
+          self.$.outputTable.input = self.componentInput;
         }
+      },
+      inputChanged: function(){
+        var self = this;
+        if (self.type == 'visual'){
+          self.componentInput = self.input;
+        }
+      }
         
       });
 
