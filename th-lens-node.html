@@ -2,7 +2,6 @@
 <link rel="import" href="../th-data-table/th-data-table.html">
 <link rel="import" href="../core-menu/core-menu.html">
 <link rel="import" href="../core-item/core-item.html">
-<link rel="import" href="../core-icon-button/core-icon-button.html">
 <link rel="import" href="../core-icons/core-icons.html">
 <link rel="import" href="../core-collapse/core-collapse.html">
 
@@ -18,7 +17,7 @@
         margin: 0 auto;
         box-sizing: border-box;
         padding: 0;
-        border: 3px solid #eee;
+        /*border: 3px solid #eee;*/
         border-radius: 5px;
       }
 
@@ -37,11 +36,22 @@
         background-color: #ddd;
         cursor: pointer;
       }
+      .input {
+        border: 3px solid #91CAFA;
+      }
+
+      .transform {
+        border: 3px solid #43A0BA;
+      }
+
+      .visualize {
+        border: 3px solid #536482;
+      }
     </style>
-    <div id="node">
+    <div id="node" class="{{type}}">
       <!-- Common among all nodes -->
       
-      <!-- Input node -->
+      <!-- INPUT NODE -->
       <template if="{{type=='input'}}">
         <div id="view">
           Enter Data: <core-icon icon="menu" data-target="collapse-view" on-click="{{toggle}}"></core-icon>
@@ -51,7 +61,7 @@
         </div>
       </template>
 
-      <!-- Transform node -->
+      <!-- TRANSFORM NODE -->
       <template if="{{type=='transform'}}">
         <div id="select">
           Select Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
@@ -68,22 +78,21 @@
           </template>
 
           <!-- *** Collapsible *** -->
-          <core-collapse id="collapse-transform">
-            <!-- Menu of components to choose from -->
-            <template if="{{!component}}">
-              <core-menu id="component-list">
-                  <core-item class="core-selected" label="None"></core-item>
-                <template repeat="{{component in componentList | filterByType}}">
-                  <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
-                </template>
-              </core-menu>
-            </template>
+            <core-collapse id="collapse-transform">
+              <!-- Menu of components to choose from -->
+              <template if="{{!component}}">
+                <core-menu id="component-list">
+                    <core-item class="core-selected" label="None"></core-item>
+                  <template repeat="{{component in componentList | filterByType}}">
+                    <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
+                  </template>
+                </core-menu>
+              </template>
 
-            <!-- Component itself -->
-            <content id="component"></content>
-          </core-collapse>
+              <!-- Component itself -->
+              <content id="component"></content>
+            </core-collapse>
           <!-- ***** -->
-
         </div>
         
         <div id="view">
@@ -94,7 +103,7 @@
         </div>
       </template>
 
-      <!-- Visual node -->
+      <!-- VISUALIZE NODE -->
       <template if="{{type=='visualize'}}">
         <div id="select">
           Select Data:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-select"></core-icon>
@@ -121,9 +130,7 @@
                 </template>
               </core-menu>
             </template>
-          
-
-
+        
             <!-- Component itself -->
             <content id="component"></content>
           </core-collapse>
@@ -202,8 +209,6 @@
           self.$.outputTable.input = self.component ? self.component.output : self.componentInput;            
         })
 
-
-
         // TODO: when transform component changes, view table should reflect that
         // TODO: transformed data should be appended to original data
 
@@ -231,8 +236,9 @@
       toggle: function(e, detail, selection){
         var self = this;
         var target = selection.dataset.target;        
+        e.stopPropagation();
         self.shadowRoot.querySelector('#'+target).toggle();
-        // this.$.collapse.toggle();
+        
       }
         
       });

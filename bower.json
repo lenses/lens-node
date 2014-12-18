@@ -5,7 +5,11 @@
   "main": "th-lens-node",
   "dependencies": {
     "polymer": "Polymer/polymer#~0.5.1",
-    "th-data-table": "thelmanews/th-data-table"
+    "th-data-table": "thelmanews/th-data-table",
+    "core-collapse": "polymer/core-collapse#~0.5.1",
+    "core-icon": "polymer/core-icon#~0.5.1",
+    "core-menu": "Polymer/core-menu#~0.5.1",
+    "core-item": "Polymer/core-item#~0.5.1"
     
   }
 }
