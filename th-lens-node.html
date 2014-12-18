@@ -69,14 +69,14 @@
         </div>
         
         <div id="view">
-          View Result:
+          View Result (read only)
             <th-data-table id="outputTable" output="{{componentOutput}}" readOnly="true"></th-data-table>
           <!-- show a datatable with output -->
         </div>
       </template>
 
       <!-- Visual node -->
-      <template if="{{type=='visual'}}">
+      <template if="{{type=='visualize'}}">
                 <div id="select">
           Select Data:
           <!-- show a datatable with input, with the entire selection made -->
@@ -115,8 +115,8 @@
       componentList: [
           {name:'th-array-function', friendly: 'Map/Reduce/Filter Functions', type: 'transform'},
           {name:'th-geocoder-firebase', friendly: 'Geocode Data', type: 'transform'},
-          {name:'th-google-map', friendly: 'Google Map', type: 'visual'},
-          {name:'th-n-bar-chart', friendly: 'Bar Chart', type: 'visual'}
+          {name:'th-google-map', friendly: 'Google Map', type: 'visualize'},
+          {name:'th-n-bar-chart', friendly: 'Bar Chart', type: 'visualize'}
       ],
       domReady: function() {
         var self = this;
@@ -191,7 +191,7 @@
       },
       inputChanged: function(){
         var self = this;
-        if (self.type == 'visual'){
+        if (self.type == 'visualize'){
           self.componentInput = self.input;
         }
       },
