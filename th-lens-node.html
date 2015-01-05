@@ -36,37 +36,81 @@
         background-color: #ddd;
         cursor: pointer;
       }
+
+      .heading {
+        color: white;
+        font-weight: 600;
+        padding: 5px;
+      }
       .input {
         border: 3px solid #91CAFA;
+      }
+
+      .input-background {
+        background-color: #91CAFA;
       }
 
       .transform {
         border: 3px solid #43A0BA;
       }
 
+      .transform-background {
+        background-color: #43A0BA;
+      }
+
       .visualize {
         border: 3px solid #536482;
+      }
+
+      .visualize-background {
+        background-color: #536482;
       }
     </style>
     <div id="node" class="{{type}}">
       <!-- Common among all nodes -->
       
       <!-- INPUT NODE -->
-      <template if="{{type=='input'}}">
+      <template if="{{type==='input'}}">
+        <div class="heading input-background"> Data Input </div>
         <div id="view">
-          Enter Data: <core-icon icon="menu" data-target="collapse-view" on-click="{{toggle}}"></core-icon>
+          
+<!--           Enter Data: <core-icon icon="menu" data-target="collapse-view" on-click="{{toggle}}"></core-icon>
           <core-collapse id="collapse-view" opened>
             <content id="component"></content>
+          </core-collapse> -->
+
+
+          Choose data source:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-view"></core-icon>
+          <!-- Name of component selected -->
+          <template if="{{component}}">
+            <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
+          </template>
+          
+          <core-collapse id="collapse-view" opened>
+            <template if="{{!component}}">  
+              <!-- Menu of components to choose from -->
+              <core-menu id="component-list">
+                  <core-item class="core-selected" label="None"></core-item>
+                <template repeat="{{component in componentList | filterByType}}">
+                  <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
+                </template>
+              </core-menu>
+            </template>
+        
+            <!-- Component itself -->
+            <content id="component"></content>
           </core-collapse>
+
         </div>
       </template>
 
       <!-- TRANSFORM NODE -->
-      <template if="{{type=='transform'}}">
+      <template if="{{type==='transform'}}">
+        <div class="heading transform-background"> Transform Data </div>
         <div id="select">
           Select Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
           <core-collapse id="collapse-select">
-            <th-data-table id="inputTable" input="{{input}}" output="{{componentInput}}"></th-data-table>
+            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{input}}" output="{{componentInput}}"></th-data-table>
           </core-collapse>
         </div>
         
@@ -98,13 +142,14 @@
         <div id="view">
           View Result (read only)<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-view"></core-icon>
           <core-collapse id="collapse-view">
-            <th-data-table id="outputTable" output="{{componentOutput}}" readOnly="true"></th-data-table>
+            <th-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" input="{{output}}" readOnly="true"></th-data-table>
           </core-collapse>
         </div>
       </template>
 
       <!-- VISUALIZE NODE -->
-      <template if="{{type=='visualize'}}">
+      <template if="{{type==='visualize'}}">
+        <div class="heading visualize-background"> Visualize </div>
         <div id="select">
           Select Data:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-select"></core-icon>
           
@@ -148,6 +193,9 @@
       type: 'transform',
 
       componentList: [
+          {name:'th-csv', friendly: 'CSV Loader', type: 'input'},
+          {name: 'th-enigma', friendly: 'Enigma Data Loader', type: 'input'},
+          {name:'th-data-table', friendly: 'Data table', type: 'input'},
           {name:'th-array-function', friendly: 'Map/Reduce/Filter Functions', type: 'transform'},
           {name:'th-geocoder-firebase', friendly: 'Geocode Data', type: 'transform'},
           {name:'th-google-map', friendly: 'Google Map', type: 'visualize'},
@@ -156,31 +204,21 @@
       domReady: function() {
         var self = this;
         this.component = this.$.component.getDistributedNodes()[1];
-        console.log(this.component);
-
         
       },
       componentInputChanged: function(){
           var self = this;
-          console.log("component input changed");
-          console.log(self.componentInput);
+
 
           if (self.componentInput.length > 0){
             if(self.component){
               self.component.input = self.componentInput;
             } else {
-              console.log("output table input changed");
               self.$.outputTable.input = self.componentInput;
-              console.log(self.componentInput);
             }
-            // console.log("******");
-            // console.log(self.componentInput)
+            
             // self.component.input = self.componentInput;
           }
-      },
-      componentOutputChanged: function(){
-        var self = this;
-        self.output = self.componentOutput;
       },
       addElement: function(e, detail, selection){
         var self = this;
@@ -202,16 +240,14 @@
         // Observes changes in the output of the first table, which is the component input
         var componentInputObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
           self.component.input = newValue;
+
         });
 
-        // Observes changes in the output of the component, which is the data in the view table
+        // Observes changes in the output of the component and binds the new value to componentOutput
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
-          self.$.outputTable.input = self.component ? self.component.output : self.componentInput;            
+          self.componentOutput = self.component.output;            
         })
-
-        // TODO: when transform component changes, view table should reflect that
-        // TODO: transformed data should be appended to original data
-
+        
       },
       componentChanged: function(){
         var self = this;
@@ -222,15 +258,49 @@
           self.$.outputTable.input = self.componentInput;
         }
       },
+      // When componentOutput changes, the output data table updates with the combined input/output; if there is no output table,
+      // the output of the node is updated
+      componentOutputChanged: function(){
+        var self = this;
+        if (self.$.outputTable){
+          self.output = self.mapTransformedData(self.componentOutput, self.input);    
+        } else {
+          self.output = self.componentOutput;
+        }
+
+      },
+      mapTransformedData: function(newData, originalData){
+        var self = this;
+
+        if (self.type === 'transform' && newData.length === originalData.length){
+          // alert("!!!");
+          self.output = originalData;
+          for (var i=0; i<newData.length; i++){
+            for (var inputKey in originalData[i]){
+              if (originalData[i][inputKey] === newData[i]['input']){ // ensures the correct values get mapped to the correct rows
+                for (var key in newData[i]){
+                  if (key !== 'input'){
+                    self.output[i][key] = newData[i][key];
+                  }
+                } 
+              }
+            }
+ 
+          }  
+        }
+
+        return self.output;
+
+      },
       inputChanged: function(){
         var self = this;
-        if (self.type == 'visualize'){
+        if (self.type === 'visualize'){
           self.componentInput = self.input;
         }
       },
       filterByType: function(value){
         var self = this;
-        var componentList = value.filter(function(component){ return component.type == self.type });
+        var componentList = value.filter(function(component){ return component.type === self.type });
         return componentList;
       },
       toggle: function(e, detail, selection){
@@ -241,7 +311,7 @@
         
       }
         
-      });
+    });
 
   </script>
 </polymer-element>
