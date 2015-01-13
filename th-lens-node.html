@@ -5,6 +5,7 @@
 <link rel="import" href="../core-icons/core-icons.html">
 <link rel="import" href="../core-collapse/core-collapse.html">
 <link rel="import" href="../th-data-criterion/th-data-criterion.html">
+<link rel="import" href="../th-data-selector/th-data-selector.html">
 
 <polymer-element name="th-lens-node" attributes="input output componentList type">
   <core-style ref="theme"></theme>
@@ -178,7 +179,10 @@
                 </template>
               </core-menu>
             </template>
-        
+          
+            <template if="{{component}}">  
+              <th-data-selector input="{{componentInput}}"></th-data-selector>
+            </template>
             <!-- Component itself -->
             <content id="component"></content>
           </core-collapse>
@@ -257,6 +261,7 @@
       },
       componentChanged: function(){
         var self = this;
+        self.fire('th-componenent-changed', self);
         if (self.component){
           self.component.animateOnInit = true;
           self.component.input = self.componentInput;
