@@ -6,7 +6,6 @@
 <link rel="import" href="../core-collapse/core-collapse.html">
 <link rel="import" href="../th-data-criterion/th-data-criterion.html">
 
-
 <polymer-element name="th-lens-node" attributes="input output componentList type">
   <core-style ref="theme"></theme>
   <template>
@@ -113,7 +112,7 @@
           Select Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
           <core-collapse id="collapse-select">
             <th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
-            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{$.filter.output}}" output="{{componentInput}}"></th-data-table>
+            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{$.filter.output || input}}" output="{{componentInput}}"></th-data-table>
           </core-collapse>
         </div>
         
@@ -158,7 +157,7 @@
           
           <core-collapse id="collapse-select">
             <th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
-            <th-data-table id="inputTable" input="{{$.filter.output}}" output="{{componentInput}}"></th-data-table>
+            <th-data-table id="inputTable" input="{{$.filter.output || input}}" output="{{componentInput}}"></th-data-table>
           </core-collapse>
         </div>
 
@@ -202,7 +201,6 @@
           {name:'th-data-table', friendly: 'Data table', type: 'input'},
           {name:'th-array-function', friendly: 'Map/Reduce/Filter Functions', type: 'transform'},
           {name:'th-geocoder-firebase', friendly: 'Geocode Data', type: 'transform'},
-          {name:'th-data-join', friendly: 'Join Columns', type: 'transform'},
           {name:'th-google-map', friendly: 'Google Map', type: 'visualize'},
           {name:'th-line-graph-touch', friendly: 'Line Graph', type: 'visualize'},
           {name:'th-n-bar-chart', friendly: 'Bar Chart', type: 'visualize'}
@@ -215,15 +213,17 @@
       componentInputChanged: function(){
           var self = this;
 
-
           if (self.component && self.componentInput.length > 0){
             if(self.component){
               self.component.input = self.componentInput;
+
             } else {
               self.$.outputTable.input = self.componentInput;
             }
-            
-            // self.component.input = self.componentInput;
+          }
+
+          if(self.$.outputTable){
+            self.$.outputTable.input = self.componentInput
           }
       },
       addElement: function(e, detail, selection){
