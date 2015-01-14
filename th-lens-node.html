@@ -158,8 +158,11 @@
           
           <core-collapse id="collapse-select">
             <th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
-            <th-data-table id="inputTable" input="{{$.filter.output || input}}" output="{{componentInput}}"></th-data-table>
+            <th-data-table id="inputTable" input="{{$.filter.output || input}}"></th-data-table>
           </core-collapse>
+          <template if="{{component}}">  
+            <th-data-selector input="{{$.inputTable.output || input}}" dataFields="{{fields}}" output="{{componentInput}}"></th-data-selector>
+          </template>
         </div>
 
         <div id="view">
@@ -180,9 +183,7 @@
               </core-menu>
             </template>
           
-            <template if="{{component}}">  
-              <th-data-selector input="{{componentInput}}"></th-data-selector>
-            </template>
+            
             <!-- Component itself -->
             <content id="component"></content>
           </core-collapse>
@@ -249,7 +250,7 @@
 
         // Observes changes in the output of the first table, which is the component input
         var componentInputObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
-          self.component.input = newValue;
+          // self.component.input = newValue;
 
         });
 
@@ -264,6 +265,7 @@
         self.fire('th-componenent-changed', self);
         if (self.component){
           self.component.animateOnInit = true;
+          self.getFieldsFromComponent();
           self.component.input = self.componentInput;
           if (self.$.outputTable){
             self.$.outputTable.input = self.component.output;
@@ -325,6 +327,13 @@
         e.stopPropagation();
         self.shadowRoot.querySelector('#'+target).toggle();
         
+      },
+      getFieldsFromComponent: function(){
+        var self = this;
+        if (self.component && self.component.getMetaData){
+          var metadata = self.component.getMetaData();
+          self.fields = metadata.fields || metadata.inputAttr.chartData.fields;
+        }
       }
         
     });
