@@ -113,7 +113,7 @@
           Select Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
           <core-collapse id="collapse-select">
             <th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
-            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{$.filter.output || input}}" output="{{componentInput}}"></th-data-table>
+            <th-data-table id="inputTable" requireSelection="true" firstRowIsHeader="{{firstRow}}" input="{{$.filter.output || input}}" output="{{componentInput}}"></th-data-table>
           </core-collapse>
         </div>
         
@@ -204,8 +204,11 @@
           {name:'th-csv', friendly: 'CSV Loader', type: 'input'},
           {name: 'th-enigma', friendly: 'Enigma Data Loader', type: 'input'},
           {name:'th-data-table', friendly: 'Data table', type: 'input'},
+
           {name:'th-array-function', friendly: 'Map/Reduce/Filter Functions', type: 'transform'},
           {name:'th-geocoder-firebase', friendly: 'Geocode Data', type: 'transform'},
+          {name:'th-data-group-by', friendly: 'Group Data', type: 'transform'},
+
           {name:'th-google-map', friendly: 'Google Map', type: 'visualize'},
           {name:'th-mapbox', friendly: 'Mapbox Map', type: 'visualize'},
           {name:'th-line-graph-touch', friendly: 'Line Graph', type: 'visualize'},
@@ -269,8 +272,10 @@
         self.fire('th-componenent-changed', self);
         if (self.component){
           self.component.animateOnInit = true;
+          self.component.style.width = "100%";
           self.getFieldsFromComponent();
           self.component.input = self.componentInput;
+          // if (self.component.input){ self.component.animate();}
           if (self.$.outputTable){
             self.$.outputTable.input = self.component.output;
           }
