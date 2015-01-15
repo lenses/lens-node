@@ -145,7 +145,7 @@
         <div id="view">
           View Result (read only)<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-view"></core-icon>
           <core-collapse id="collapse-view">
-            <th-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" input="{{output}}" readOnly="true"></th-data-table>
+            <th-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" readOnly="true"></th-data-table>
           </core-collapse>
         </div>
       </template>
@@ -234,9 +234,9 @@
             }
           }
 
-          if(self.$.outputTable){
-            self.$.outputTable.input = self.componentInput
-          }
+          // if(self.$.outputTable){
+          //   self.$.outputTable.input = self.componentInput
+          // }
       },
       addElement: function(e, detail, selection){
         var self = this;
@@ -290,7 +290,9 @@
       componentOutputChanged: function(){
         var self = this;
         if (self.$.outputTable){
-          self.output = self.mapTransformedData(self.componentOutput, self.input);    
+          // self.output = self.mapTransformedData(self.componentOutput, self.input);    
+          self.$.outputTable.input = self.componentOutput;
+          // self.output = self.componentOutput;
         } else {
           self.output = self.componentOutput;
         }
