@@ -113,7 +113,7 @@
           Select Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
           <core-collapse id="collapse-select">
             <th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
-            <th-data-table id="inputTable" requireSelection="true" firstRowIsHeader="{{firstRow}}" input="{{$.filter.output || input}}" output="{{componentInput}}"></th-data-table>
+            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{$.filter.output || input}}" output="{{componentInput}}"></th-data-table>
           </core-collapse>
         </div>
         
@@ -145,7 +145,7 @@
         <div id="view">
           View Result (read only)<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-view"></core-icon>
           <core-collapse id="collapse-view">
-            <th-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" input="{{output}}" readOnly="true"></th-data-table>
+            <th-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" output="{{output}}"  readOnly="true"></th-data-table>
           </core-collapse>
         </div>
       </template>
@@ -208,6 +208,8 @@
           {name:'th-array-function', friendly: 'Map/Reduce/Filter Functions', type: 'transform'},
           {name:'th-geocoder-firebase', friendly: 'Geocode Data', type: 'transform'},
           {name:'th-data-group-by', friendly: 'Group Data', type: 'transform'},
+          {name:'th-data-split', friendly: 'Split Column', type: 'transform'},
+          {name:'th-data-join', friendly: 'Join Columns', type: 'transform'},
 
           {name:'th-google-map', friendly: 'Google Map', type: 'visualize'},
           {name:'th-mapbox', friendly: 'Mapbox Map', type: 'visualize'},
@@ -230,11 +232,11 @@
               self.component.input = self.componentInput;
 
             } else {
-              self.$.outputTable.input = self.componentInput;
+              // self.$.outputTable.input = self.componentInput;
             }
           }
 
-          if(self.$.outputTable){
+          if(self.$.outputTable && !self.component){
             self.$.outputTable.input = self.componentInput
           }
       },
@@ -255,6 +257,8 @@
       setObservers: function(){
         var self = this;
 
+
+
         // Observes changes in the output of the first table, which is the component input
         var componentInputObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
           // self.component.input = newValue;
@@ -263,7 +267,8 @@
 
         // Observes changes in the output of the component and binds the new value to componentOutput
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
-          self.componentOutput = self.component.output;            
+          self.componentOutput = self.component.output;    
+
         })
         
       },
@@ -276,9 +281,9 @@
           self.getFieldsFromComponent();
           self.component.input = self.componentInput;
           // if (self.component.input){ self.component.animate();}
-          if (self.$.outputTable){
-            self.$.outputTable.input = self.component.output;
-          }
+          // if (self.$.outputTable){
+          //   self.$.outputTable.input = self.component.output;
+          // }
         } else {
           if (self.$.outputTable){
             self.$.outputTable.input = self.componentInput;
@@ -290,35 +295,36 @@
       componentOutputChanged: function(){
         var self = this;
         if (self.$.outputTable){
-          self.output = self.mapTransformedData(self.componentOutput, self.input);    
+          self.$.outputTable.input = self.componentOutput;
         } else {
           self.output = self.componentOutput;
         }
 
       },
-      mapTransformedData: function(newData, originalData){
-        var self = this;
+      // DONT NEED ANYMORE? 
+      // mapTransformedData: function(newData, originalData){
+      //   var self = this;
 
-        if (self.type === 'transform' && newData.length === originalData.length){
-          // alert("!!!");
-          self.output = originalData;
-          for (var i=0; i<newData.length; i++){
-            for (var inputKey in originalData[i]){
-              if (originalData[i][inputKey] === newData[i]['input']){ // ensures the correct values get mapped to the correct rows
-                for (var key in newData[i]){
-                  if (key !== 'input'){
-                    self.output[i][key] = newData[i][key];
-                  }
-                } 
-              }
-            }
+      //   if (self.type === 'transform' && newData.length === originalData.length){
+      //     // alert("!!!");
+      //     self.output = originalData;
+      //     for (var i=0; i<newData.length; i++){
+      //       for (var inputKey in originalData[i]){
+      //         if (originalData[i][inputKey] === newData[i]['input']){ // ensures the correct values get mapped to the correct rows
+      //           for (var key in newData[i]){
+      //             if (key !== 'input'){
+      //               self.output[i][key] = newData[i][key];
+      //             }
+      //           } 
+      //         }
+      //       }
  
-          }  
-        }
+      //     }  
+      //   }
 
-        return self.output;
+      //   return self.output;
 
-      },
+      // },
       inputChanged: function(){
         var self = this;
         if (self.type === 'visualize'){
