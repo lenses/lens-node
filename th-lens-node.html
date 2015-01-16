@@ -92,9 +92,9 @@
             <template if="{{!component}}">  
               <!-- Menu of components to choose from -->
               <core-menu id="component-list">
-                  <core-item class="core-selected" label="None"></core-item>
+                  <!-- <core-item class="core-selected" label="None"></core-item> -->
                 <template repeat="{{component in componentList | filterByType}}">
-                  <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
+                  <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
                 </template>
               </core-menu>
             </template>
@@ -112,7 +112,7 @@
         <div id="select">
           Select Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
           <core-collapse id="collapse-select">
-            <th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
+            Filter Options<th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
             <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{$.filter.output || input}}" output="{{componentInput}}"></th-data-table>
           </core-collapse>
         </div>
@@ -129,9 +129,9 @@
               <!-- Menu of components to choose from -->
               <template if="{{!component}}">
                 <core-menu id="component-list">
-                    <core-item class="core-selected" label="None"></core-item>
+                    <!-- <core-item class="core-selected" label="None"></core-item> -->
                   <template repeat="{{component in componentList | filterByType}}">
-                    <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
+                    <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
                   </template>
                 </core-menu>
               </template>
@@ -157,7 +157,7 @@
           Select Data:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-select"></core-icon>
           
           <core-collapse id="collapse-select">
-            <th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
+            Filter Options<th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
             <th-data-table id="inputTable" input="{{$.filter.output || input}}"></th-data-table>
           </core-collapse>
           <template if="{{component}}">  
@@ -176,9 +176,9 @@
             <template if="{{!component}}">  
               <!-- Menu of components to choose from -->
               <core-menu id="component-list">
-                  <core-item class="core-selected" label="None"></core-item>
+                  <!-- <core-item class="core-selected" label="None"></core-item> -->
                 <template repeat="{{component in componentList | filterByType}}">
-                  <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.name}}"></core-item>
+                  <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
                 </template>
               </core-menu>
             </template>
@@ -201,14 +201,16 @@
       type: 'transform',
 
       componentList: [
+          {name:'th-data-table', friendly: 'Data table', type: 'input'},
           {name:'th-csv', friendly: 'CSV Loader', type: 'input'},
           {name: 'th-enigma', friendly: 'Enigma Data Loader', type: 'input'},
-          {name:'th-data-table', friendly: 'Data table', type: 'input'},
+          
 
-          {name:'th-array-function', friendly: 'Map/Reduce/Filter Functions', type: 'transform'},
-          {name:'th-geocoder-firebase', friendly: 'Geocode Data', type: 'transform'},
+          {name:'th-array-function', friendly: 'Map/Reduce Function (JavaScript)', type: 'transform'},
+          {name:'th-geocoder-firebase', friendly: 'Get Geocodes for Map', type: 'transform'},
           {name:'th-data-group-by', friendly: 'Group Data', type: 'transform'},
           {name:'th-data-split', friendly: 'Split Column', type: 'transform'},
+          {name:'th-data-criterion', friendly: 'Filter Data', type: 'transform'},
           {name:'th-data-join', friendly: 'Join Columns', type: 'transform'},
 
           {name:'th-google-map', friendly: 'Google Map', type: 'visualize'},
@@ -244,8 +246,7 @@
         var self = this;
         self.component = document.createElement(selection.className);
         self.appendChild(self.component);
-        
-        self.componentName = self.component.tagName.toLowerCase();
+        self.componentName = selection.label
         self.setObservers();
       },
       removeElement: function(e, detail, selection){
