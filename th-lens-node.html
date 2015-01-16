@@ -257,8 +257,6 @@
       setObservers: function(){
         var self = this;
 
-
-
         // Observes changes in the output of the first table, which is the component input
         var componentInputObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
           // self.component.input = newValue;
@@ -280,7 +278,6 @@
           self.component.style.width = "100%";
           self.getFieldsFromComponent();
           self.component.input = self.componentInput;
-          // if (self.component.input){ self.component.animate();}
           // if (self.$.outputTable){
           //   self.$.outputTable.input = self.component.output;
           // }
