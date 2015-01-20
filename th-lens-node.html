@@ -158,7 +158,7 @@
           
           <core-collapse id="collapse-select">
             Filter Options<th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
-            <th-data-table id="inputTable" input="{{$.filter.output || input}}"></th-data-table>
+            <th-data-table id="inputTable" input="{{$.filter.output || input}}" output="{{output}}"></th-data-table>
           </core-collapse>
           <template if="{{component}}">  
             <th-data-selector input="{{$.inputTable.output || input}}" dataFields="{{fields}}" output="{{componentInput}}"></th-data-selector>
