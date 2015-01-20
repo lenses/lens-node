@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../th-data-table/th-data-table.html">
+<!-- <link rel="import" href="../th-data-table/th-data-table.html"> -->
 <link rel="import" href="../core-menu/core-menu.html">
 <link rel="import" href="../core-item/core-item.html">
 <link rel="import" href="../core-icons/core-icons.html">
@@ -243,11 +243,17 @@
           }
       },
       addElement: function(e, detail, selection){
-        var self = this;
-        self.component = document.createElement(selection.className);
-        self.appendChild(self.component);
-        self.componentName = selection.label
-        self.setObservers();
+        var self = this,
+            name = selection.className,
+            pathToEl = "../" + name + "/" + name + ".html";
+
+        Polymer.import([pathToEl], function(){
+          self.component = document.createElement(name);
+          self.appendChild(self.component);
+          self.componentName = selection.label
+          self.setObservers();      
+        })
+        
       },
       removeElement: function(e, detail, selection){
         var self = this;
