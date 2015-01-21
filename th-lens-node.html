@@ -7,7 +7,7 @@
 <link rel="import" href="../th-data-criterion/th-data-criterion.html">
 <link rel="import" href="../th-data-selector/th-data-selector.html">
 
-<polymer-element name="th-lens-node" attributes="input output componentList type">
+<polymer-element name="th-lens-node" attributes="input output componentList type pathToComponents">
   <core-style ref="theme"></theme>
   <template>
     <style>
@@ -199,13 +199,12 @@
       // componentInput: [],
       componentOutput: [],
       type: 'transform',
-
+      pathToComponents: '../',
       componentList: [
           {name:'th-data-table', friendly: 'Data table', type: 'input'},
           {name:'th-csv', friendly: 'CSV Loader', type: 'input'},
           {name: 'th-enigma', friendly: 'Enigma Data Loader', type: 'input'},
           
-
           {name:'th-array-function', friendly: 'Map/Reduce Function (JavaScript)', type: 'transform'},
           {name:'th-geocoder-firebase', friendly: 'Get Geocodes for Map', type: 'transform'},
           {name:'th-data-group-by', friendly: 'Group Data', type: 'transform'},
@@ -245,7 +244,7 @@
       addElement: function(e, detail, selection){
         var self = this,
             name = selection.className,
-            pathToEl = "../" + name + "/" + name + ".html";
+            pathToEl = self.pathToComponents + name + "/" + name + ".html";
 
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
