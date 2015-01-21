@@ -247,7 +247,7 @@
             name = selection.className,
             pathToEl = "../" + name + "/" + name + ".html";
 
-        Polymer.import([pathToEl], function(){
+        Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
           self.appendChild(self.component);
           self.componentName = selection.label
@@ -305,30 +305,7 @@
         }
 
       },
-      // DONT NEED ANYMORE? 
-      // mapTransformedData: function(newData, originalData){
-      //   var self = this;
 
-      //   if (self.type === 'transform' && newData.length === originalData.length){
-      //     // alert("!!!");
-      //     self.output = originalData;
-      //     for (var i=0; i<newData.length; i++){
-      //       for (var inputKey in originalData[i]){
-      //         if (originalData[i][inputKey] === newData[i]['input']){ // ensures the correct values get mapped to the correct rows
-      //           for (var key in newData[i]){
-      //             if (key !== 'input'){
-      //               self.output[i][key] = newData[i][key];
-      //             }
-      //           } 
-      //         }
-      //       }
- 
-      //     }  
-      //   }
-
-      //   return self.output;
-
-      // },
       inputChanged: function(){
         var self = this;
         if (self.type === 'visualize'){
