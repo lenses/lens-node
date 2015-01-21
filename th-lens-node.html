@@ -160,8 +160,8 @@
             Filter Options<th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
             <th-data-table id="inputTable" input="{{$.filter.output || input}}" output="{{output}}"></th-data-table>
           </core-collapse>
-          <template if="{{component}}">  
-            <th-data-selector input="{{$.inputTable.output || input}}" dataFields="{{fields}}" output="{{componentInput}}"></th-data-selector>
+          <template if="{{componentMetadata}}">  
+            <th-data-selector input="{{output}}" dataFields="{{fields}}" output="{{componentInput}}"></th-data-selector>
           </template>
         </div>
 
@@ -213,8 +213,10 @@
           {name:'th-data-join', friendly: 'Join Columns', type: 'transform'},
 
           {name:'th-google-map', friendly: 'Google Map', type: 'visualize'},
+          {name:'th-google-bar-chart', friendly: 'Google Bar Chart', type: 'visualize'},
           {name:'th-mapbox', friendly: 'Mapbox Map', type: 'visualize'},
-          {name:'th-line-graph-touch', friendly: 'Line Graph', type: 'visualize'},
+          {name:'th-google-line', friendly: 'Multi Line Graph', type: 'visualize'},
+          {name:'th-line-graph-touch', friendly: 'Single Line Graph', type: 'visualize'},
           {name:'th-google-scatter-bubble', friendly: 'Bubble Chart', type: 'visualize'},
           {name:'th-google-pie', friendly: 'Pie Chart', type: 'visualize'},
           {name:'th-n-bar-chart-horizontal', friendly: 'Horizontal Bar Chart', type: 'visualize'},
@@ -230,7 +232,9 @@
 
           if (self.component && self.componentInput.length > 0){
             if(self.component){
-              self.component.input = self.componentInput;
+
+              self.component.input = self.componentInput.map(function(item){return item});
+              self.component.init();
 
             } else {
               // self.$.outputTable.input = self.componentInput;
@@ -266,11 +270,13 @@
         // Observes changes in the output of the first table, which is the component input
         var componentInputObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
           // self.component.input = newValue;
+          
 
         });
 
         // Observes changes in the output of the component and binds the new value to componentOutput
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
+          console.log("component output observer change");
           self.componentOutput = self.component.output;    
 
         })
@@ -299,7 +305,7 @@
         var self = this;
         if (self.$.outputTable){
           self.$.outputTable.input = self.componentOutput;
-        } else {
+        } else if (self.type != "visualize") {
           self.output = self.componentOutput;
         }
 
@@ -308,6 +314,7 @@
       inputChanged: function(){
         var self = this;
         if (self.type === 'visualize'){
+          console.log("visual input changed")
           self.componentInput = self.input;
         }
       },
@@ -326,8 +333,11 @@
       getFieldsFromComponent: function(){
         var self = this;
         if (self.component && self.component.getMetaData){
+          self.componentMetadata = true;
           var metadata = self.component.getMetaData();
           self.fields = metadata.fields || metadata.inputAttr.chartData.fields;
+        } else {
+          self.componentMetadata = false;
         }
       }
         
