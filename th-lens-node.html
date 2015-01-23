@@ -8,8 +8,9 @@
 <link rel="import" href="../th-data-selector/th-data-selector.html">
 
 <polymer-element name="th-lens-node" attributes="input output componentList type pathToComponents">
-  <template>
+  
     <core-style ref="theme"></theme>
+    <template>
     <link rel="stylesheet" href="th-lens-node.css">
 
     <div id="node" class="{{type}}">
@@ -30,7 +31,6 @@
             <template if="{{!component}}">  
               <!-- Menu of components to choose from -->
               <core-menu id="component-list">
-                  <!-- <core-item class="core-selected" label="None"></core-item> -->
                 <template repeat="{{component in componentList | filterByType}}">
                   <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
                 </template>
@@ -48,7 +48,7 @@
       <template if="{{type==='transform'}}">
         <div class="heading transform-background"> Transform Data </div>
         <div id="select">
-          Select Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
+          Select data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
           <core-collapse id="collapse-select">
             Filter Options<th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
             <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{$.filter.output || input}}" output="{{componentInput}}"></th-data-table>
