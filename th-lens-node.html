@@ -50,8 +50,8 @@
         <div id="select">
           Select data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
           <core-collapse id="collapse-select">
-            Filter Options<th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
-            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{$.filter.output || input}}" output="{{componentInput}}"></th-data-table>
+            Filter Options<th-data-criterion id="transformfilter" input="{{input}}"></th-data-criterion>
+            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{$.transformfilter.output || input}}" output="{{componentInput}}"></th-data-table>
           </core-collapse>
         </div>
         
@@ -95,8 +95,8 @@
           Select Data:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-select"></core-icon>
           
           <core-collapse id="collapse-select">
-            Filter Options<th-data-criterion id="filter" input="{{input}}"></th-data-criterion>
-            <th-data-table id="inputTable" input="{{$.filter.output || input}}" output="{{output}}"></th-data-table>
+            Filter Options<th-data-criterion id="visualfilter" input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
+            <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{output}}"></th-data-table>
           </core-collapse>
           <template if="{{componentMetadata}}">  
             <th-data-selector input="{{output}}" dataFields="{{fields}}" output="{{componentInput}}"></th-data-selector>
@@ -278,6 +278,13 @@
         } else {
           self.componentMetadata = false;
         }
+      },
+      outputChanged: function(){
+        var self = this;
+
+        // If node is visual, the output is the result of the datatable 
+        
+        
       }
         
     });
