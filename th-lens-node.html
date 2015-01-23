@@ -96,10 +96,10 @@
           
           <core-collapse id="collapse-select">
             Filter Options<th-data-criterion id="visualfilter" input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
-            <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{output}}"></th-data-table>
+            <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{componentInput}}"></th-data-table>
           </core-collapse>
-          <template if="{{componentMetadata}}">  
-            <th-data-selector input="{{output}}" dataFields="{{fields}}" output="{{componentInput}}"></th-data-selector>
+          <template if="{{showDataSelector}}">  
+            <th-data-selector id="dataselector" input="{{componentInput}}" dataFields="{{fields}}" output="{{selectedComponentInput}}"></th-data-selector>
           </template>
         </div>
 
@@ -114,7 +114,6 @@
             <template if="{{!component}}">  
               <!-- Menu of components to choose from -->
               <core-menu id="component-list">
-                  <!-- <core-item class="core-selected" label="None"></core-item> -->
                 <template repeat="{{component in componentList | filterByType}}">
                   <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
                 </template>
@@ -166,24 +165,6 @@
         this.component = this.$.component.getDistributedNodes()[1];
         
       },
-      componentInputChanged: function(){
-          var self = this;
-
-          if (self.component && self.componentInput.length > 0){
-            if(self.component){
-
-              self.component.input = self.componentInput.map(function(item){return item});
-              self.component.init();
-
-            } else {
-              // self.$.outputTable.input = self.componentInput;
-            }
-          }
-
-          if(self.$.outputTable && !self.component){
-            self.$.outputTable.input = self.componentInput
-          }
-      },
       addElement: function(e, detail, selection){
         var self = this,
             name = selection.className,
@@ -191,6 +172,11 @@
 
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
+          if (self.type =="visualize"){
+            self.component.input = self.selectedComponentInput || self.componentInput;
+          }
+
+          console.log(self.component.input);
           self.appendChild(self.component);
           self.componentName = selection.label
           self.setObservers();      
@@ -203,15 +189,68 @@
         self.component = null;
         
       },
+      componentChanged: function(){
+        var self = this;
+          
+        if (self.component){
+         
+          self.component.animateOnInit = true;
+          self.component.style.width = "100%";
+          self.getFieldsFromComponent();
+          self.component.input = self.selectedComponentInput || self.componentInput;
+          // if (self.$.outputTable){
+          //   self.$.outputTable.input = self.component.output;
+          // }
+        } else {
+          if (self.$.outputTable){ // for Transform nodes
+            self.$.outputTable.input = self.componentInput;
+          }
+        }
+      },
+      componentInputChanged: function(){
+        console.log("Component input changed")
+          var self = this;
+console.log("componentInputChanged");
+          if (self.component && self.componentInput.length > 0){
+            
+            if(self.showDataSelector){
+              console.log("filter input thru dataselector");
+              self.$.dataselector.input = self.componentInput;
+              self.component.input = self.selectedComponentInput;
+
+              // self.component.input = self.componentInput.map(function(item){return item});
+              // self.component.init();
+
+            } else {
+              self.component.input = self.componentInput;
+            }
+          }
+
+          if(self.$.outputTable && !self.component){
+            self.$.outputTable.input = self.componentInput
+          }
+      },
       setObservers: function(){
         var self = this;
 
-        // Observes changes in the output of the first table, which is the component input
-        var componentInputObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
-          // self.component.input = newValue;
+        // // Observes changes in the output of the first table, which is the component input
+        // var dataTableObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
+        //   console.log("input table observer change");
+        //   if(!self.showDataSelector){
+            
+        //   self.component.input = newValue;
+        //   }
+
+        // });
+
+
+        // var dataSelectorObserver = new PathObserver(self.$.dataselector, 'output').open(function(newValue, oldValue){
+        //   console.log("selector observer change");
+        //   self.component.input = newValue;
           
 
-        });
+        // });
+
 
         // Observes changes in the output of the component and binds the new value to componentOutput
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
@@ -221,23 +260,7 @@
         })
         
       },
-      componentChanged: function(){
-        var self = this;
-        self.fire('th-componenent-changed', self);
-        if (self.component){
-          self.component.animateOnInit = true;
-          self.component.style.width = "100%";
-          self.getFieldsFromComponent();
-          self.component.input = self.componentInput;
-          // if (self.$.outputTable){
-          //   self.$.outputTable.input = self.component.output;
-          // }
-        } else {
-          if (self.$.outputTable){
-            self.$.outputTable.input = self.componentInput;
-          }
-        }
-      },
+
       // When componentOutput changes, the output data table updates with the combined input/output; if there is no output table,
       // the output of the node is updated
       componentOutputChanged: function(){
@@ -249,43 +272,67 @@
         }
 
       },
-
-      inputChanged: function(){
-        var self = this;
-        if (self.type === 'visualize'){
-          console.log("visual input changed")
-          self.componentInput = self.input;
-        }
-      },
       filterByType: function(value){
         var self = this;
         var componentList = value.filter(function(component){ return component.type === self.type });
         return componentList;
+      
+        
+      },
+      getFieldsFromComponent: function(){
+        var self = this;
+        if (self.component && self.component.getMetaData){
+          self.showDataSelector = true;
+          var metadata = self.component.getMetaData();
+          self.fields = metadata.fields || metadata.inputAttr.chartData.fields;
+          // var dataSelectorObserver = new PathObserver(self.$.dataselector, 'output').open(function(newValue, oldValue){
+            
+          //   self.component.input = newValue;
+
+          // })
+
+
+          // var dataSelectorObserver = new PathObserver(self.$.dataselector, 'output').open(function(newValue, oldValue){
+            
+          //   self.component.input = newValue;
+
+          // })
+        } else {
+          self.showDataSelector = false;
+          // var inputTableObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
+            
+          //   self.component.input = newValue;
+
+          // })
+        }
+      },
+      selectedComponentInputChanged: function(newValue, oldValue){
+        var self = this;
+        console.log("selectedComponentInputChanged");
+        console.log(self.component);
+        self.component.input = newValue;
       },
       toggle: function(e, detail, selection){
         var self = this;
         var target = selection.dataset.target;        
         e.stopPropagation();
         self.shadowRoot.querySelector('#'+target).toggle();
-        
-      },
-      getFieldsFromComponent: function(){
-        var self = this;
-        if (self.component && self.component.getMetaData){
-          self.componentMetadata = true;
-          var metadata = self.component.getMetaData();
-          self.fields = metadata.fields || metadata.inputAttr.chartData.fields;
-        } else {
-          self.componentMetadata = false;
-        }
-      },
-      outputChanged: function(){
-        var self = this;
-
-        // If node is visual, the output is the result of the datatable 
-        
-        
       }
+
+      // NOTES:
+      // inputtable output flows to:
+      // - component in transform node
+      // - component in visual node if there showDataselector is false
+      // - dataSelector in visual node if showDataslector is true
+      // - output in visual node (map it out)
+      // data selector output flows to:
+      // - component input in visual node
+      // component output flows to:
+      // - output in input node
+      // - outputtable in transform node
+      // - nowhere in visual node
+      // outputtable output flows to:
+      // - output in transform node
         
     });
 
