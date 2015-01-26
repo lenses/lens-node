@@ -20,7 +20,7 @@
         <div class="heading input-background"> Data Input </div>
         <div id="view">
 
-          Choose data source:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-view"></core-icon>
+          Choose data source:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
           <!-- Name of component selected -->
           <template if="{{component}}">
             <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
@@ -49,16 +49,16 @@
         <div id="select">
           
           <!-- INPUT TABLE --> 
-          Select data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
+          Select data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggleCollapse}}"></core-icon>
           <core-collapse id="collapse-select">
             Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
-            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{dataOutput}}"></th-data-table>
+            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}"></th-data-table>
           </core-collapse>
         </div>
         
         <!-- COMPONENT --> 
         <div id="transform">
-          Transform:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-transform"></core-icon>
+          Transform:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-transform"></core-icon>
           <!-- Name of component selected -->
           <template if="{{component}}">
             <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
@@ -84,7 +84,7 @@
         
         <!-- OUTPUT TABLE --> 
         <div id="view">
-          View Result (read only)<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-view"></core-icon>
+          View Result (read only)<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
           <core-collapse id="collapse-view">
             <th-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" output="{{output}}"  readOnly="true"></th-data-table>
           </core-collapse>
@@ -95,19 +95,19 @@
       <template if="{{type==='visualize'}}">
         <div class="heading visualize-background"> Visualize </div>
         <div id="select">
-          Select Data:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-select"></core-icon>
+          Select Data:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-select"></core-icon>
           
           <core-collapse id="collapse-select">
             Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
-            <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{dataOutput}}"></th-data-table>
+            <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{data}}"></th-data-table>
           </core-collapse>
           <template if="{{showDataSelector}}">  
-            <th-data-selector id="dataselector" input="{{dataOutput}}" dataFields="{{fields}}" output="{{selectedDataOutput}}"></th-data-selector>
+            <th-data-selector id="dataselector" input="{{data}}" dataFields="{{fields}}" output="{{selectedData}}"></th-data-selector>
           </template>
         </div>
 
         <div id="view">
-          Choose a visual:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-view"></core-icon>
+          Choose a visual:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
           <!-- Name of component selected -->
           <template if="{{component}}">
             <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
@@ -176,7 +176,10 @@
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
           if (self.type =="visualize"){
-            self.component.input = self.cloneArray(self.selectedDataOutput) || self.cloneArray(self.dataOutput);
+
+            
+            self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
+            
           }
           self.appendChild(self.component);
           self.componentName = selection.label
@@ -200,7 +203,7 @@
           self.component.animateOnInit = true;
           self.component.style.width = "100%";
           self.getFieldsFromComponent();
-          self.component.input = self.cloneArray(self.selectedDataOutput) || self.cloneArray(self.dataOutput);
+          self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
         }
       },
 
@@ -229,23 +232,23 @@
           self.showDataSelector = false;
         }
       },
-      dataOutputChanged: function(){
+      dataChanged: function(){
           var self = this;
 
           // If there's a component (and data in the table)
-          if (self.component && self.dataOutput.length > 0){
+          if (self.component && self.data.length > 0){
             // Pass data through selector before hitting component, if necessary
             if(self.showDataSelector){
-              self.$.dataselector.input = self.cloneArray(self.dataOutput);
+              self.$.dataselector.input = self.cloneArray(self.data);
           
             // Otherwise send it straight through component
             } else {
-              self.component.input = self.cloneArray(self.dataOutput);
+              self.component.input = self.cloneArray(self.data);
             }
 
           // Otherwise bind any data in the input table straight to the output table 
           } else if (self.$.outputTable && !self.component){
-            self.$.outputTable.input = self.cloneArray(self.dataOutput);
+            self.$.outputTable.input = self.cloneArray(self.data);
           }
 
           // Set output of visual node 
@@ -253,7 +256,7 @@
             self.output = self.cloneArray(self.input);
           }
       },
-      selectedDataOutputChanged: function(newValue, oldValue){
+      selectedDataChanged: function(newValue, oldValue){
         var self = this;
         self.component.input = self.cloneArray(newValue);
       },
@@ -267,7 +270,7 @@
           self.$.outputTable.input = self.cloneArray(self.componentOutput);
         }
       },
-      toggle: function(e, detail, selection){
+      toggleCollapse: function(e, detail, selection){
         var self = this;
         var target = selection.dataset.target;        
         e.stopPropagation();
