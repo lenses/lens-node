@@ -1,0 +1,20 @@
+{
+  "name": "th-data-utility",
+  "keywords": "thelma, polymer, web-components",
+  "main": "th-data-utility.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.1",
+    "lodash": "~2.4.1",
+    "numeral": "~1.5.3"
+  },
+  "homepage": "https://github.com/thelmanews/th-data-utility",
+  "_release": "dbc68da8ed",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "dbc68da8ed3dcb69aef7f15e6096af90c127a5b3"
+  },
+  "_source": "git://github.com/thelmanews/th-data-utility.git",
+  "_target": "*",
+  "_originalSource": "thelmanews/th-data-utility"
+}

@@ -1,0 +1,26 @@
+{
+  "name": "th-data-table",
+  "keywords": [
+    "seed",
+    "polymer",
+    "web-components"
+  ],
+  "main": "th-data-table.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.1",
+    "handsontable": "handsontable/handsontable#>=0.12.0"
+  },
+  "devDependencies": {
+    "polymer-test-tools": "Polymer/polymer-test-tools#^0.4.0"
+  },
+  "homepage": "https://github.com/thelmanews/th-data-table",
+  "_release": "f42e765c21",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "f42e765c2196aea3135c1a344f7367521c498535"
+  },
+  "_source": "git://github.com/thelmanews/th-data-table.git",
+  "_target": "*",
+  "_originalSource": "thelmanews/th-data-table"
+}

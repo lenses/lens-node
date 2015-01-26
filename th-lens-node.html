@@ -8,7 +8,6 @@
 <link rel="import" href="../th-data-selector/th-data-selector.html">
 
 <polymer-element name="th-lens-node" attributes="input output componentList type pathToComponents">
-  
     <core-style ref="theme"></theme>
     <template>
     <link rel="stylesheet" href="th-lens-node.css">
@@ -16,7 +15,7 @@
     <div id="node" class="{{type}}">
       <!-- Common among all nodes -->
       
-      <!-- INPUT NODE -->
+      <!-------------------------------- INPUT NODE -------------------------------->
       <template if="{{type==='input'}}">
         <div class="heading input-background"> Data Input </div>
         <div id="view">
@@ -44,7 +43,7 @@
         </div>
       </template>
 
-      <!-- TRANSFORM NODE -->
+      <!-------------------------------- TRANSFORM NODE -------------------------------->
       <template if="{{type==='transform'}}">
         <div class="heading transform-background"> Transform Data </div>
         <div id="select">
@@ -92,7 +91,7 @@
         </div>
       </template>
 
-      <!-- VISUALIZE NODE -->
+      <!-------------------------------- VISUALIZE NODE -------------------------------->
       <template if="{{type==='visualize'}}">
         <div class="heading visualize-background"> Visualize </div>
         <div id="select">
@@ -152,6 +151,7 @@
           {name:'th-data-criterion', friendly: 'Filter Data', type: 'transform'},
           {name:'th-data-sort', friendly: 'Sort Data', type: 'transform'},
           {name:'th-data-join', friendly: 'Join Columns', type: 'transform'},
+          {name:'th-math-formula', friendly: 'Math & Trig Functions', type: 'transform'},
 
           {name:'th-google-map', friendly: 'Google Map', type: 'visualize'},
           {name:'th-google-bar-chart', friendly: 'Google Bar Chart', type: 'visualize'},
@@ -165,8 +165,8 @@
       ],
       domReady: function() {
         var self = this;
-        this.component = this.$.component.getDistributedNodes()[1];
-        
+        self.component = self.$.component.getDistributedNodes()[1];
+    
       },
       addElement: function(e, detail, selection){
         var self = this,
@@ -176,15 +176,11 @@
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
           if (self.type =="visualize"){
-            
             self.component.input = self.cloneArray(self.selectedDataOutput) || self.cloneArray(self.dataOutput);
-            
           }
-
-          console.log(self.component.input);
           self.appendChild(self.component);
           self.componentName = selection.label
-          self.setObservers();      
+          self.setComponentObserver();      
         })
         
       },
@@ -208,27 +204,8 @@
         }
       },
 
-      setObservers: function(){
+      setComponentObserver: function(){
         var self = this;
-
-        // // Observes changes in the output of the first table, which is the component input
-        // var dataTableObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
-        //   console.log("input table observer change");
-        //   if(!self.showDataSelector){
-            
-        //   self.component.input = newValue;
-        //   }
-
-        // });
-
-
-        // var dataSelectorObserver = new PathObserver(self.$.dataselector, 'output').open(function(newValue, oldValue){
-        //   console.log("selector observer change");
-        //   self.component.input = newValue;
-          
-
-        // });
-
 
         // Observes changes in the output of the component and binds the new value to componentOutput
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
@@ -236,17 +213,11 @@
           self.componentOutput = self.component.output;    
 
         })
-        
-
       },
-
-
       filterByType: function(value){
         var self = this;
         var componentList = value.filter(function(component){ return component.type === self.type });
         return componentList;
-      
-        
       },
       getFieldsFromComponent: function(){
         var self = this;
@@ -254,25 +225,8 @@
           self.showDataSelector = true;
           var metadata = self.component.getMetaData();
           self.fields = metadata.fields || metadata.inputAttr.chartData.fields;
-          // var dataSelectorObserver = new PathObserver(self.$.dataselector, 'output').open(function(newValue, oldValue){
-            
-          //   self.component.input = newValue;
-
-          // })
-
-
-          // var dataSelectorObserver = new PathObserver(self.$.dataselector, 'output').open(function(newValue, oldValue){
-            
-          //   self.component.input = newValue;
-
-          // })
         } else {
           self.showDataSelector = false;
-          // var inputTableObserver = new PathObserver(self.$.inputTable, 'output').open(function(newValue, oldValue){
-            
-          //   self.component.input = newValue;
-
-          // })
         }
       },
       dataOutputChanged: function(){
@@ -296,27 +250,22 @@
 
           // Set output of visual node 
           if(self.type=="visualize"){
-            self.output = self.cloneArray(self.dataOutput);
+            self.output = self.cloneArray(self.input);
           }
       },
       selectedDataOutputChanged: function(newValue, oldValue){
         var self = this;
-        
         self.component.input = self.cloneArray(newValue);
-
       },
       // When componentOutput changes, the output data table updates with the combined input/output; if there is no output table,
       // the output of the node is updated
       componentOutputChanged: function(){
         var self = this;
         if (self.type === "input") {
-          // self.output = self.componentOutput;
           self.output = self.cloneArray(self.componentOutput);
-          // self.mapOutput(self.componentOutput);
         } else if (self.type === "transform"){
           self.$.outputTable.input = self.cloneArray(self.componentOutput);
         }
-
       },
       toggle: function(e, detail, selection){
         var self = this;
@@ -346,6 +295,7 @@
       // when data is selected if it changes, chart should change too.
       // fix data selector so if the fields are available, it selects those 
       // fix data selector so if that it picks first numerical column for value
+      // the data selector is getting the intermediate input variables from the chart?!
       // 
         
     });
