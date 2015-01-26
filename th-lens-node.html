@@ -189,6 +189,9 @@
         self.component = null;
         
       },
+      cloneArray: function(arr){
+        return [].map.call(arr, function(item){ return item; });
+      },
       componentChanged: function(){
         var self = this;
           
@@ -265,10 +268,12 @@ console.log("componentInputChanged");
       // the output of the node is updated
       componentOutputChanged: function(){
         var self = this;
-        if (self.$.outputTable){
-          self.$.outputTable.input = self.componentOutput;
-        } else if (self.type != "visualize") {
-          self.output = self.componentOutput;
+        if (self.type === "transform"){
+          self.$.outputTable.input = self.cloneArray(self.componentOutput);
+        } else if (self.type === "input") {
+          // self.output = self.componentOutput;
+          self.output = self.cloneArray(self.componentOutput);
+          // self.mapOutput(self.componentOutput);
         }
 
       },
@@ -328,11 +333,11 @@ console.log("componentInputChanged");
       // data selector output flows to:
       // - component input in visual node
       // component output flows to:
-      // - output in input node
-      // - outputtable in transform node
-      // - nowhere in visual node
+      // --- output in input node 
+      // --- outputtable in transform node
+      // --- nowhere in visual node
       // outputtable output flows to:
-      // - output in transform node
+      // --- output in transform node
         
     });
 
