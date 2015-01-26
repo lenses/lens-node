@@ -48,13 +48,16 @@
       <template if="{{type==='transform'}}">
         <div class="heading transform-background"> Transform Data </div>
         <div id="select">
+          
+          <!-- INPUT TABLE --> 
           Select data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggle}}"></core-icon>
           <core-collapse id="collapse-select">
-            Filter Options<th-data-criterion id="transformfilter" input="{{input}}"></th-data-criterion>
-            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{$.transformfilter.output || input}}" output="{{componentInput}}"></th-data-table>
+            Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
+            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{dataOutput}}"></th-data-table>
           </core-collapse>
         </div>
         
+        <!-- COMPONENT --> 
         <div id="transform">
           Transform:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-transform"></core-icon>
           <!-- Name of component selected -->
@@ -80,6 +83,7 @@
           <!-- ***** -->
         </div>
         
+        <!-- OUTPUT TABLE --> 
         <div id="view">
           View Result (read only)<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-view"></core-icon>
           <core-collapse id="collapse-view">
@@ -95,11 +99,11 @@
           Select Data:<core-icon icon="menu" on-click="{{toggle}}" data-target="collapse-select"></core-icon>
           
           <core-collapse id="collapse-select">
-            Filter Options<th-data-criterion id="visualfilter" input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
-            <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{componentInput}}"></th-data-table>
+            Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
+            <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{dataOutput}}"></th-data-table>
           </core-collapse>
           <template if="{{showDataSelector}}">  
-            <th-data-selector id="dataselector" input="{{componentInput}}" dataFields="{{fields}}" output="{{selectedComponentInput}}"></th-data-selector>
+            <th-data-selector id="dataselector" input="{{dataOutput}}" dataFields="{{fields}}" output="{{selectedDataOutput}}"></th-data-selector>
           </template>
         </div>
 
@@ -133,7 +137,6 @@
   <script>
 
       Polymer('th-lens-node', {
-      // componentInput: [],
       componentOutput: [],
       type: 'transform',
       pathToComponents: '../',
@@ -173,7 +176,9 @@
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
           if (self.type =="visualize"){
-            self.component.input = self.selectedComponentInput || self.componentInput;
+            
+            self.component.input = self.cloneArray(self.selectedDataOutput) || self.cloneArray(self.dataOutput);
+            
           }
 
           console.log(self.component.input);
@@ -190,49 +195,19 @@
         
       },
       cloneArray: function(arr){
-        return [].map.call(arr, function(item){ return item; });
+        return arr && arr.constructor === Array ?  [].map.call(arr, function(item){ return item; }) : undefined;
       },
       componentChanged: function(){
         var self = this;
           
         if (self.component){
-         
           self.component.animateOnInit = true;
           self.component.style.width = "100%";
           self.getFieldsFromComponent();
-          self.component.input = self.selectedComponentInput || self.componentInput;
-          // if (self.$.outputTable){
-          //   self.$.outputTable.input = self.component.output;
-          // }
-        } else {
-          if (self.$.outputTable){ // for Transform nodes
-            self.$.outputTable.input = self.componentInput;
-          }
+          self.component.input = self.cloneArray(self.selectedDataOutput) || self.cloneArray(self.dataOutput);
         }
       },
-      componentInputChanged: function(){
-        console.log("Component input changed")
-          var self = this;
-console.log("componentInputChanged");
-          if (self.component && self.componentInput.length > 0){
-            
-            if(self.showDataSelector){
-              console.log("filter input thru dataselector");
-              self.$.dataselector.input = self.componentInput;
-              self.component.input = self.selectedComponentInput;
 
-              // self.component.input = self.componentInput.map(function(item){return item});
-              // self.component.init();
-
-            } else {
-              self.component.input = self.componentInput;
-            }
-          }
-
-          if(self.$.outputTable && !self.component){
-            self.$.outputTable.input = self.componentInput
-          }
-      },
       setObservers: function(){
         var self = this;
 
@@ -262,21 +237,10 @@ console.log("componentInputChanged");
 
         })
         
-      },
-
-      // When componentOutput changes, the output data table updates with the combined input/output; if there is no output table,
-      // the output of the node is updated
-      componentOutputChanged: function(){
-        var self = this;
-        if (self.type === "transform"){
-          self.$.outputTable.input = self.cloneArray(self.componentOutput);
-        } else if (self.type === "input") {
-          // self.output = self.componentOutput;
-          self.output = self.cloneArray(self.componentOutput);
-          // self.mapOutput(self.componentOutput);
-        }
 
       },
+
+
       filterByType: function(value){
         var self = this;
         var componentList = value.filter(function(component){ return component.type === self.type });
@@ -311,11 +275,48 @@ console.log("componentInputChanged");
           // })
         }
       },
-      selectedComponentInputChanged: function(newValue, oldValue){
+      dataOutputChanged: function(){
+          var self = this;
+
+          // If there's a component (and data in the table)
+          if (self.component && self.dataOutput.length > 0){
+            // Pass data through selector before hitting component, if necessary
+            if(self.showDataSelector){
+              self.$.dataselector.input = self.cloneArray(self.dataOutput);
+          
+            // Otherwise send it straight through component
+            } else {
+              self.component.input = self.cloneArray(self.dataOutput);
+            }
+
+          // Otherwise bind any data in the input table straight to the output table 
+          } else if (self.$.outputTable && !self.component){
+            self.$.outputTable.input = self.cloneArray(self.dataOutput);
+          }
+
+          // Set output of visual node 
+          if(self.type=="visualize"){
+            self.output = self.cloneArray(self.dataOutput);
+          }
+      },
+      selectedDataOutputChanged: function(newValue, oldValue){
         var self = this;
-        console.log("selectedComponentInputChanged");
-        console.log(self.component);
-        self.component.input = newValue;
+        
+        self.component.input = self.cloneArray(newValue);
+
+      },
+      // When componentOutput changes, the output data table updates with the combined input/output; if there is no output table,
+      // the output of the node is updated
+      componentOutputChanged: function(){
+        var self = this;
+        if (self.type === "input") {
+          // self.output = self.componentOutput;
+          self.output = self.cloneArray(self.componentOutput);
+          // self.mapOutput(self.componentOutput);
+        } else if (self.type === "transform"){
+          self.$.outputTable.input = self.cloneArray(self.componentOutput);
+        }
+
       },
       toggle: function(e, detail, selection){
         var self = this;
@@ -326,10 +327,10 @@ console.log("componentInputChanged");
 
       // NOTES:
       // inputtable output flows to:
-      // - component in transform node
-      // - component in visual node if there showDataselector is false
-      // - dataSelector in visual node if showDataslector is true
-      // - output in visual node (map it out)
+      // --- component in transform node
+      // --- component in visual node if showDataselector is false
+      // --- dataSelector in visual node if showDataslector is true
+      // --- output in visual node (map it out)
       // data selector output flows to:
       // - component input in visual node
       // component output flows to:
@@ -338,6 +339,14 @@ console.log("componentInputChanged");
       // --- nowhere in visual node
       // outputtable output flows to:
       // --- output in transform node
+      // 
+      // data is not going thru data selector automatically (when selection is already made)
+      // charts that use data selector still dont initialze properly (is that because its selecting the wrong default data?)
+      // data-selector needs an input change watcher to remap the data to output automatically
+      // when data is selected if it changes, chart should change too.
+      // fix data selector so if the fields are available, it selects those 
+      // fix data selector so if that it picks first numerical column for value
+      // 
         
     });
 
