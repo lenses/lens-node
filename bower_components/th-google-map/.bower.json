@@ -1,0 +1,19 @@
+{
+  "name": "th-google-map",
+  "keywords": "seed, polymer, web-components",
+  "main": "th-google-map.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.1",
+    "google-map": "~0.4.0"
+  },
+  "homepage": "https://github.com/thelmanews/th-google-map",
+  "_release": "2d7403f066",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "2d7403f066baeb0d0936c67ae5acceabe1a0bc54"
+  },
+  "_source": "git://github.com/thelmanews/th-google-map.git",
+  "_target": "*",
+  "_originalSource": "thelmanews/th-google-map"
+}

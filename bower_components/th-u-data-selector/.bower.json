@@ -1,0 +1,20 @@
+{
+  "name": "th-u-data-selector",
+  "keywords": "thelma, polymer, web-components",
+  "main": "th-u-data-selector.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.1",
+    "th-data-utility": "thelmanews/th-data-utility"
+  },
+  "homepage": "https://github.com/thelmanews/th-u-data-selector",
+  "_release": "931d64b97a",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "931d64b97a267345600e81403ecd09815de9d9d0"
+  },
+  "_source": "git://github.com/thelmanews/th-u-data-selector.git",
+  "_target": "*",
+  "_originalSource": "thelmanews/th-u-data-selector",
+  "_direct": true
+}
