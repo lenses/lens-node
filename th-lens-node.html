@@ -118,6 +118,7 @@
 
         <div id="view">
           Choose a visual:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
+          <template if="{{component}}">  <core-icon icon="check" id="checkmark" on-click="{{selectFinalResult}}" ></core-icon></template>
           <core-collapse id="collapse-view">
             
             <!-- Name of component selected -->
@@ -156,6 +157,7 @@
        * 'pathToComponents' is the path to the directory of components that might be added in, used for dynamically adding HTML imports
        * @type {String}
        */
+      finalResult: false,
       pathToComponents: '../',
       /**
        * 'componentList' list of components that can be added to any type of node
@@ -354,6 +356,17 @@
         var target = selection.dataset.target;        
         e.stopPropagation();
         self.shadowRoot.querySelector('#'+target).toggle();
+      },
+      /**
+       * 'selectFinalResult' callback to when the checkmark for a particular graph is clicked. This adds 'final-result'
+       * to the component in this node and fires an event which is caught by th-lens-composer to remove
+       * 'final-result' from other components in different nodes.
+       */
+      selectFinalResult: function(e, detail, selection){
+        var self = this;
+        this.fire('th-select-final-result', { selection: selection, component: self.component});
+        self.component.classList.add('final-result');
+        selection.classList.add('final-result-selected');
       }
 
         
