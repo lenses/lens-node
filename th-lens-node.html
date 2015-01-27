@@ -206,15 +206,12 @@
           self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
         }
       },
-
       setComponentObserver: function(){
         var self = this;
 
         // Observes changes in the output of the component and binds the new value to componentOutput
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
-          console.log("component output observer change");
           self.componentOutput = self.component.output;    
-
         })
       },
       filterByType: function(value){
@@ -270,6 +267,14 @@
           self.$.outputTable.input = self.cloneArray(self.componentOutput);
         }
       },
+      inputChanged: function(){
+        var self = this;
+        // If data in a previous node changes, it should flow through to all visual nodes
+        // Set output of visual node 
+        if(self.type=="visualize"){
+          self.output = self.cloneArray(self.input);
+        }
+      },
       toggleCollapse: function(e, detail, selection){
         var self = this;
         var target = selection.dataset.target;        
@@ -277,29 +282,6 @@
         self.shadowRoot.querySelector('#'+target).toggle();
       }
 
-      // NOTES:
-      // inputtable output flows to:
-      // --- component in transform node
-      // --- component in visual node if showDataselector is false
-      // --- dataSelector in visual node if showDataslector is true
-      // --- output in visual node (map it out)
-      // data selector output flows to:
-      // - component input in visual node
-      // component output flows to:
-      // --- output in input node 
-      // --- outputtable in transform node
-      // --- nowhere in visual node
-      // outputtable output flows to:
-      // --- output in transform node
-      // 
-      // data is not going thru data selector automatically (when selection is already made)
-      // charts that use data selector still dont initialze properly (is that because its selecting the wrong default data?)
-      // data-selector needs an input change watcher to remap the data to output automatically
-      // when data is selected if it changes, chart should change too.
-      // fix data selector so if the fields are available, it selects those 
-      // fix data selector so if that it picks first numerical column for value
-      // the data selector is getting the intermediate input variables from the chart?!
-      // 
         
     });
 
