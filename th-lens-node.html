@@ -17,18 +17,22 @@
       
       <!-------------------------------- INPUT NODE -------------------------------->
       <template if="{{type==='input'}}">
-        <div class="heading input-background"> Data Input </div>
+        <div class="heading input-background">
+          <template if="{{!componentName}}"> Data Input </template>
+          <template if="{{componentName}}"> {{componentName}} </template>
+        </div>
         <div id="view">
 
           Choose data source:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
-          <!-- Name of component selected -->
-          <template if="{{component}}">
-            <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
-          </template>
-          
           <core-collapse id="collapse-view" opened>
+            <!-- Name of component selected -->
+            <template if="{{component}}">
+              <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
+            </template>
+          
+            <!-- Menu of components to choose from -->
             <template if="{{!component}}">  
-              <!-- Menu of components to choose from -->
+              
               <core-menu id="component-list">
                 <template repeat="{{component in componentList | filterByType}}">
                   <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
@@ -45,7 +49,10 @@
 
       <!-------------------------------- TRANSFORM NODE -------------------------------->
       <template if="{{type==='transform'}}">
-        <div class="heading transform-background"> Transform Data </div>
+        <div class="heading transform-background"> 
+          <template if="{{!componentName}}"> Transform Data </template>
+          <template if="{{componentName}}"> {{componentName}} </template>
+        </div>
         <div id="select">
           
           <!-- INPUT TABLE --> 
@@ -59,13 +66,13 @@
         <!-- COMPONENT --> 
         <div id="transform">
           Transform:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-transform"></core-icon>
-          <!-- Name of component selected -->
-          <template if="{{component}}">
-            <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
-          </template>
-
           <!-- *** Collapsible *** -->
             <core-collapse id="collapse-transform">
+              <!-- Name of component selected -->
+              <template if="{{component}}">
+                <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
+              </template>
+
               <!-- Menu of components to choose from -->
               <template if="{{!component}}">
                 <core-menu id="component-list">
@@ -93,29 +100,33 @@
 
       <!-------------------------------- VISUALIZE NODE -------------------------------->
       <template if="{{type==='visualize'}}">
-        <div class="heading visualize-background"> Visualize </div>
+        <div class="heading visualize-background"> 
+          <template if="{{!componentName}}"> Visualize Data </template>
+          <template if="{{componentName}}"> {{componentName}} </template>
+        </div>
         <div id="select">
           Select Data:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-select"></core-icon>
           
           <core-collapse id="collapse-select">
             Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
             <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{data}}"></th-data-table>
+            <template if="{{showDataSelector}}">  
+              <th-data-selector id="dataselector" input="{{data}}" dataFields="{{fields}}" output="{{selectedData}}"></th-data-selector>
+            </template>
           </core-collapse>
-          <template if="{{showDataSelector}}">  
-            <th-data-selector id="dataselector" input="{{data}}" dataFields="{{fields}}" output="{{selectedData}}"></th-data-selector>
-          </template>
         </div>
 
         <div id="view">
           Choose a visual:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
-          <!-- Name of component selected -->
-          <template if="{{component}}">
-            <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
-          </template>
-          
           <core-collapse id="collapse-view">
+            
+            <!-- Name of component selected -->
+            <template if="{{component}}">
+              <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
+            </template>
+            
+            <!-- Menu of components to choose from -->
             <template if="{{!component}}">  
-              <!-- Menu of components to choose from -->
               <core-menu id="component-list">
                 <template repeat="{{component in componentList | filterByType}}">
                   <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
@@ -134,91 +145,141 @@
   </template>
 
   <script>
-
-      Polymer('th-lens-node', {
+    Polymer('th-lens-node', {
       componentOutput: [],
+      /**
+       * 'type' can be 'input', 'transform', or 'visualize', referring to the type of component the node should be able to process
+       * @type {String}
+       */
       type: 'transform',
+      /**
+       * 'pathToComponents' is the path to the directory of components that might be added in, used for dynamically adding HTML imports
+       * @type {String}
+       */
       pathToComponents: '../',
+      /**
+       * 'componentList' list of components that can be added to any type of node
+       * @type {Array}
+       * @properties: name, friendly, type
+       */
       componentList: [
           {name:'th-data-table', friendly: 'Data table', type: 'input'},
           {name:'th-csv', friendly: 'CSV Loader', type: 'input'},
           {name: 'th-enigma', friendly: 'Enigma Data Loader', type: 'input'},
           
-          {name:'th-array-function', friendly: 'Map/Reduce Function (JavaScript)', type: 'transform'},
           {name:'th-geocoder-firebase', friendly: 'Get Geocodes for Map', type: 'transform'},
           {name:'th-data-group-by', friendly: 'Group Data', type: 'transform'},
-          {name:'th-data-split', friendly: 'Split Column', type: 'transform'},
           {name:'th-data-criterion', friendly: 'Filter Data', type: 'transform'},
           {name:'th-data-sort', friendly: 'Sort Data', type: 'transform'},
+          {name:'th-data-split', friendly: 'Split Column', type: 'transform'},
           {name:'th-data-join', friendly: 'Join Columns', type: 'transform'},
           {name:'th-math-formula', friendly: 'Math & Trig Functions', type: 'transform'},
+          {name:'th-array-function', friendly: 'Map/Reduce Function (JavaScript)', type: 'transform'},
 
           {name:'th-google-map', friendly: 'Google Map', type: 'visualize'},
-          {name:'th-google-bar-chart', friendly: 'Google Bar Chart', type: 'visualize'},
           {name:'th-mapbox', friendly: 'Mapbox Map', type: 'visualize'},
+          {name:'th-google-bar-chart', friendly: 'Google Bar Chart', type: 'visualize'},
           {name:'th-google-line', friendly: 'Google Line Graph', type: 'visualize'},
-          {name:'th-line-graph-touch', friendly: 'Single Line Graph', type: 'visualize'},
-          {name:'th-google-scatter-bubble', friendly: 'Bubble Chart', type: 'visualize'},
-          {name:'th-google-pie', friendly: 'Pie Chart', type: 'visualize'},
-          {name:'th-n-bar-chart-horizontal', friendly: 'Horizontal Bar Chart', type: 'visualize'},
-          {name:'th-n-bar-chart', friendly: 'Bar Chart', type: 'visualize'}
+          {name:'th-google-scatter-bubble', friendly: 'Google Bubble Chart', type: 'visualize'},
+          {name:'th-google-pie', friendly: 'Google Pie Chart', type: 'visualize'},
+          {name:'th-line-graph-touch', friendly: 'Thelma Line Graph', type: 'visualize'},
+          {name:'th-n-bar-chart-horizontal', friendly: 'Thelma Horizontal Bar Chart', type: 'visualize'},
+          {name:'th-n-bar-chart', friendly: 'Thelma Bar Chart', type: 'visualize'}
       ],
       domReady: function() {
         var self = this;
+        // Find the child component if exists
         self.component = self.$.component.getDistributedNodes()[1];
     
       },
+      /**
+       * 'addElement' callback to when an element is clicked on; element is imported, initialized and appended to the DOM
+       * @param {[type]} 'selection' is the element clicked 
+       */
       addElement: function(e, detail, selection){
         var self = this,
             name = selection.className,
-            pathToEl = self.pathToComponents + name + "/" + name + ".html";
+            pathToEl = self.pathToComponents + name + "/" + name + ".html"; // construct path to component
 
+        // Dynamically create HTML import for component
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
-          if (self.type =="visualize"){
-
-            
+          if (self.type !=="input"){ // if the component is visual, set the input to the data selector output if avail, otherwise the table data
             self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
-            
-          }
+          } 
+            // if (self.component){
+          // self.component.animateOnInit = true;
+          // self.component.style.width = "100%";
+          // self.getFieldsFromComponent();
+          // self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
+        // }
+
           self.appendChild(self.component);
           self.componentName = selection.label
-          self.setComponentObserver();      
+          self.setComponentObserver(); // observe changes to output of component
         })
         
       },
+      /**
+       * removeElement removes the component from the page 
+       * @param {[type]} 'selection' is the element clicked 
+       */
       removeElement: function(e, detail, selection){
         var self = this;
         self.removeChild(self.component);
         self.component = null;
+        self.componentName = null;
         
       },
+      /**
+       * 'cloneArray' If argument is an array, it returns a clone of it, otherwise returns undefined
+       * @param  {array} arr 
+       * @return {array} 
+       */
       cloneArray: function(arr){
         return arr && arr.constructor === Array ?  [].map.call(arr, function(item){ return item; }) : undefined;
       },
       componentChanged: function(){
         var self = this;
-          
         if (self.component){
           self.component.animateOnInit = true;
           self.component.style.width = "100%";
           self.getFieldsFromComponent();
-          self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
+          // self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
+        } else {
+          switch(self.type){
+            case "input":
+              self.output = self.cloneArray(self.input);
+              break;
+            case "transform":
+              self.$.outputTable.input = self.cloneArray(self.data);
+              break;
+            default:
+              break;
+          }
         }
       },
+      /**
+       * 'setComponentObserver' sets up an observer for changes in the output of the component and binds the new value to componentOutput
+       */
       setComponentObserver: function(){
         var self = this;
-
-        // Observes changes in the output of the component and binds the new value to componentOutput
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
           self.componentOutput = self.component.output;    
         })
       },
+      /**
+       * filterByType is a filter for the componentList, to show only the available component options for a particular type of node
+       */
       filterByType: function(value){
         var self = this;
         var componentList = value.filter(function(component){ return component.type === self.type });
         return componentList;
       },
+      /**
+       * 'getFieldsFromComponent' 
+       * @return {[type]} [description]
+       */
       getFieldsFromComponent: function(){
         var self = this;
         if (self.component && self.component.getMetaData){
@@ -229,6 +290,9 @@
           self.showDataSelector = false;
         }
       },
+      /**
+       * 'dataChanged' is an observer for output of input data table
+       */
       dataChanged: function(){
           var self = this;
 
@@ -253,12 +317,16 @@
             self.output = self.cloneArray(self.input);
           }
       },
+      /**
+       * 'selectedDataChanged' is an observer for output of data selector 
+       */
       selectedDataChanged: function(newValue, oldValue){
         var self = this;
         self.component.input = self.cloneArray(newValue);
       },
-      // When componentOutput changes, the output data table updates with the combined input/output; if there is no output table,
-      // the output of the node is updated
+      /**
+       * 'componentOutputChanged' is an observer for output of the component
+       */
       componentOutputChanged: function(){
         var self = this;
         if (self.type === "input") {
@@ -267,6 +335,9 @@
           self.$.outputTable.input = self.cloneArray(self.componentOutput);
         }
       },
+      /**
+       * 'inputChanged' is an observer for input of the node
+       */
       inputChanged: function(){
         var self = this;
         // If data in a previous node changes, it should flow through to all visual nodes
@@ -275,6 +346,9 @@
           self.output = self.cloneArray(self.input);
         }
       },
+      /**
+       * 'toggleCollapse' toggles the collapse state of the selection
+       */
       toggleCollapse: function(e, detail, selection){
         var self = this;
         var target = selection.dataset.target;        
