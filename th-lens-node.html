@@ -56,7 +56,7 @@
         <div id="select">
           
           <!-- INPUT TABLE --> 
-          Select data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggleCollapse}}"></core-icon>
+          Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggleCollapse}}"></core-icon>
           <core-collapse id="collapse-select">
             Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
             <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}"></th-data-table>
@@ -91,7 +91,7 @@
         
         <!-- OUTPUT TABLE --> 
         <div id="view">
-          View Result (read only)<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
+          Result (read only)<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
           <core-collapse id="collapse-view">
             <th-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" output="{{output}}"  readOnly="true"></th-data-table>
           </core-collapse>
@@ -105,7 +105,7 @@
           <template if="{{componentName}}"> {{componentName}} </template>
         </div>
         <div id="select">
-          Select Data:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-select"></core-icon>
+          Data:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-select"></core-icon>
           
           <core-collapse id="collapse-select">
             Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
