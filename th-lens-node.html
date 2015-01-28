@@ -363,7 +363,10 @@
        */
       selectFinalResult: function(e, detail, selection){
         var self = this;
+        // Upon firing, th-lens-composer removes the respective classes from all icons/components
         this.fire('th-select-final-result', { selection: selection, component: self.component});
+
+        // Add final result class to component and to the icon as indicator
         self.component.classList.add('final-result');
         selection.classList.add('final-result-selected');
       }
