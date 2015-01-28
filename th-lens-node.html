@@ -221,6 +221,30 @@
         })
         
       },
+      createElement: function(name, attrs){
+        var self = this,
+            pathToEl = self.pathToComponents + name + "/" + name + ".html"; // construct path to component
+
+        Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
+          self.component = document.createElement(name);
+          console.log("*!*!*!**!*!*!*!");
+          self.componentName = self.componentList.filter(function(component){ return component.name === name })[0].friendly;
+          console.log(self.componentName);
+          console.log(self.component);
+          console.log(attrs);
+          for (var attrName in attrs){
+            console.log(attrName);
+            console.log(attrs[attrName]);
+            self.component.attrName = attrs[attrName];
+          }
+          console.log(self.component);
+          self.appendChild(self.component);
+
+          // self.componentName = selection.label
+          self.setComponentObserver(); // observe changes to output of component
+        })
+
+      },
       /**
        * removeElement removes the component from the page 
        * @param {[type]} 'selection' is the element clicked 
