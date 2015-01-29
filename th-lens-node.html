@@ -7,7 +7,7 @@
 <link rel="import" href="../th-data-criterion/th-data-criterion.html">
 <link rel="import" href="../th-data-selector/th-data-selector.html">
 
-<polymer-element name="th-lens-node" attributes="input output componentList type pathToComponents">
+<polymer-element name="th-lens-node" attributes="input output componentList type pathToComponents finalResult">
     <core-style ref="theme"></theme>
     <template>
     <link rel="stylesheet" href="th-lens-node.css">
@@ -118,7 +118,16 @@
 
         <div id="view">
           Choose a visual:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
-          <template if="{{component}}">  <core-icon icon="check" id="checkmark" on-click="{{selectFinalResult}}" ></core-icon></template>
+          <template if="{{component}}">  
+            <template if="{{finalResult}}">
+              <core-icon icon="check" class="final-result-selected" id="checkmark" on-click="{{deselectFinalResult}}" ></core-icon>
+            </template>
+            <template if="{{!finalResult}}">
+              <core-icon icon="check" id="checkmark" on-click="{{selectFinalResult}}" ></core-icon>
+            </template>
+            
+
+          </template>
           <core-collapse id="collapse-view">
             
             <!-- Name of component selected -->
@@ -152,6 +161,7 @@
        * 'type' can be 'input', 'transform', or 'visualize', referring to the type of component the node should be able to process
        * @type {String}
        */
+      finalResult: false,
       type: 'transform',
       /**
        * 'pathToComponents' is the path to the directory of components that might be added in, used for dynamically adding HTML imports
@@ -387,12 +397,16 @@
        */
       selectFinalResult: function(e, detail, selection){
         var self = this;
-        // Upon firing, th-lens-composer removes the respective classes from all icons/components
+
+        // Upon firing, th-lens-composer sets finalResult to false of all the nodes
         this.fire('th-select-final-result', { selection: selection, component: self.component});
 
-        // Add final result class to component and to the icon as indicator
-        self.component.classList.add('final-result');
-        selection.classList.add('final-result-selected');
+        // Set finalResult of this node to true
+        self.finalResult = true;
+      },
+      deselectFinalResult: function(e, detail, selection){
+        var self = this;
+        self.finalResult = false;
       }
 
         
