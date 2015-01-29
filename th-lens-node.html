@@ -235,7 +235,7 @@
           for (var attrName in attrs){
             console.log(attrName);
             console.log(attrs[attrName]);
-            self.component.attrName = attrs[attrName];
+            self.component[attrName] = attrs[attrName];
           }
           console.log(self.component);
           self.appendChild(self.component);
