@@ -15,7 +15,7 @@
     "th-data-selector": "thelmanews/th-data-selector",
     "th-data-group-by": "thelmanews/th-data-group-by",
     "th-data-utility": "thelmanews/th-data-utility",
-    "th-data-join": "lenses/th-data-join",
+    "th-data-join": "thelmanews/th-data-join",
     "th-data-split": "thelmanews/th-data-split",
     "core-collapse": "polymer/core-collapse#~0.5.1",
     "core-icon": "polymer/core-icon#~0.5.1",
