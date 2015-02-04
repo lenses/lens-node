@@ -58,7 +58,6 @@
           <!-- INPUT TABLE --> 
           Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggleCollapse}}"></core-icon>
           <core-collapse id="collapse-select">
-            Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
             <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}"></th-data-table>
           </core-collapse>
         </div>
