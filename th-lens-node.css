@@ -55,11 +55,19 @@ core-item::shadow #label{
   background-color: #536482;
 }
 
-#checkmark {
+#toggle {
   float: right;
 }
 
-.final-result-selected {
-        color: #52CC6A;
-      
+.toggle-text {
+  float: right;
+  margin: 0px 5px;
+}
+
+paper-toggle-button::shadow [checked] .toggle {
+  background-color: #536482;
+}
+
+paper-toggle-button::shadow [checked] .toggle-ink {
+  color: #536482;
 }

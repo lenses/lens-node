@@ -3,6 +3,7 @@
 <link rel="import" href="../core-menu/core-menu.html">
 <link rel="import" href="../core-item/core-item.html">
 <link rel="import" href="../core-icons/core-icons.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../core-collapse/core-collapse.html">
 <link rel="import" href="../th-data-criterion/th-data-criterion.html">
 <link rel="import" href="../th-data-selector/th-data-selector.html">
@@ -119,10 +120,10 @@
           Choose a visual:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
           <template if="{{component}}">  
             <template if="{{finalResult}}">
-              <core-icon icon="check" class="final-result-selected" id="checkmark" on-click="{{deselectFinalResult}}" ></core-icon>
+              <paper-toggle-button id="toggle" checked="true" on-click="{{deselectFinalResult}}" ></paper-toggle-button><span class="toggle-text">Selected </span>
             </template>
             <template if="{{!finalResult}}">
-              <core-icon icon="check" id="checkmark" on-click="{{selectFinalResult}}" ></core-icon>
+              <paper-toggle-button id="toggle" checked="false" on-click="{{selectFinalResult}}" ></paper-toggle-button><span class="toggle-text">Select to publish? </span>
             </template>
             
 
@@ -384,15 +385,13 @@
         self.shadowRoot.querySelector('#'+target).toggle();
       },
       /**
-       * 'selectFinalResult' callback to when the checkmark for a particular graph is clicked. This adds 'final-result'
-       * to the component in this node and fires an event which is caught by th-lens-composer to remove
-       * 'final-result' from other components in different nodes.
+       * 'selectFinalResult' callback to when the final result switch for a particular graph is clicked. 
        */
       selectFinalResult: function(e, detail, selection){
         var self = this;
 
-        // Upon firing, th-lens-composer sets finalResult to false of all the nodes
-        this.fire('th-select-final-result', { selection: selection, component: self.component});
+        // Sets all other nodes' finalResult to false
+        self.parentNode.deselectFinalResultAll();
 
         // Set finalResult of this node to true
         self.finalResult = true;
