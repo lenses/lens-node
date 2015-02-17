@@ -210,7 +210,8 @@
       addElement: function(e, detail, selection){
         var self = this,
             name = selection.className,
-            pathToEl = self.pathToComponents + name + "/" + name + ".html"; // construct path to component
+            directory = self.pathToComponents + name + "/" + name + ".html",
+            pathToEl = this.resolvePath(directory); // construct path to component
 
         // Dynamically create HTML import for component
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
@@ -233,7 +234,8 @@
       },
       createElementFromSavedData: function(name, attrs){
         var self = this,
-            pathToEl = self.pathToComponents + name + "/" + name + ".html"; // construct path to component
+            directory = self.pathToComponents + name + "/" + name + ".html",
+            pathToEl = this.resolvePath(directory); // construct path to component
 
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
