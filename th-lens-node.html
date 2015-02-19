@@ -3,6 +3,7 @@
 <link rel="import" href="../core-menu/core-menu.html">
 <link rel="import" href="../core-item/core-item.html">
 <link rel="import" href="../core-icons/core-icons.html">
+<link rel="import" href="../core-icons/device-icons.html">
 <link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../core-collapse/core-collapse.html">
 <link rel="import" href="../th-data-criterion/th-data-criterion.html">
@@ -146,11 +147,14 @@
             </template>
           
           </core-collapse>
-          
-          <!-- Component itself -->
-          <content id="component"></content>  
-          
+          <div id="chartcontainer" style="height:{{component | heightFilter }};">
+            <!-- Component itself -->
+            <content id="component"></content>  
+            <core-icon icon="device:signal-cellular-0-bar" class="resize"  draggable="true"  on-dragStart="{{dragResizeStart}}" on-drag="{{dragResize}}" on-dragEnd="{{dragResizeEnd}}"></core-icon>  
+          </div>
+        
         </div>
+
       </template>
       
     </div>
@@ -221,6 +225,8 @@
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
           if (self.type !=="input"){ // if the component is visual, set the input to the data selector output if avail, otherwise the table data
+            self.component.style.height = "100%";
+            self.component.style.width = "100%";
             self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
           } 
             // if (self.component){
@@ -245,6 +251,8 @@
 
           Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
             self.component = document.createElement(name);
+            self.component.style.height = "100%";
+            self.component.style.width = "100%";
 
             self.componentName = self.componentList.filter(function(component){ return component.name === name })[0].friendly;
 
@@ -409,8 +417,28 @@
       deselectFinalResult: function(e, detail, selection){
         var self = this;
         self.finalResult = false;
+      },
+      dragResizeStart: function(e, detail, selection){
+        var self = this;
+        self.chartHeight = selection.parentNode.offsetHeight;
+        self.startY = e.y;
+      },
+      dragResize: function(e, detail, selection){
+        var self = this;
+        var movement = e.y - self.startY;
+        selection.parentNode.style.height = self.chartHeight + movement + 'px';
+      
+      },
+      dragResizeEnd: function(e, detail, selection){
+        var self = this;
+        var movement = e.y - self.startY; 
+        selection.parentNode.style.height = self.chartHeight + movement + 'px';
+        self.component.resize();
+      },
+      heightFilter: function(value){
+        return value ? "400px" : "0px";
+        
       }
-
         
     });
 

@@ -20,6 +20,10 @@
   padding: 5px;
 }
 
+#chartcontainer {
+  width: 100%;
+}
+
 core-item::shadow #label{
   padding: 5px;
   background-color: #eee;
@@ -70,4 +74,14 @@ paper-toggle-button::shadow [checked] .toggle {
 
 paper-toggle-button::shadow [checked] .toggle-ink {
   color: #536482;
+}
+
+.resize {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 15px;
+  height: 15px;
+  cursor: s-resize;
+ 
 }
