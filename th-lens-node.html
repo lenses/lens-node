@@ -117,7 +117,7 @@
         </div>
 
         <div id="view">
-          Choose a visual:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
+           <!--<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon> -->
           <template if="{{component}}">  
             <template if="{{finalResult}}">
               <paper-toggle-button id="toggle" checked="true" on-click="{{deselectFinalResult}}" ></paper-toggle-button><span class="toggle-text">Selected </span>
@@ -128,7 +128,7 @@
             
 
           </template>
-          <core-collapse id="collapse-view">
+          <core-collapse id="collapse-view" opened>
             
             <!-- Name of component selected -->
             <template if="{{component}}">
@@ -136,7 +136,8 @@
             </template>
             
             <!-- Menu of components to choose from -->
-            <template if="{{!component}}">  
+            <template if="{{!component}}">
+            Choose a visual:  
               <core-menu id="component-list">
                 <template repeat="{{component in componentList | filterByType}}">
                   <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
@@ -144,10 +145,11 @@
               </core-menu>
             </template>
           
-            
-            <!-- Component itself -->
-            <content id="component"></content>
           </core-collapse>
+          
+          <!-- Component itself -->
+          <content id="component"></content>  
+          
         </div>
       </template>
       
@@ -200,9 +202,9 @@
       ],
       domReady: function() {
         var self = this;
+        self.fire('dom-ready');
         // Find the child component if exists
         self.component = self.$.component.getDistributedNodes()[1];
-    
       },
       /**
        * 'addElement' callback to when an element is clicked on; element is imported, initialized and appended to the DOM
@@ -214,6 +216,7 @@
             directory = self.pathToComponents + name + "/" + name + ".html",
             pathToEl = this.resolvePath(directory); // construct path to component
 
+        
         // Dynamically create HTML import for component
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
@@ -238,17 +241,21 @@
             directory = self.pathToComponents + name + "/" + name + ".html",
             pathToEl = this.resolvePath(directory); // construct path to component
 
-        Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
-          self.component = document.createElement(name);
+        self.addEventListener('dom-ready', function(){
 
-          self.componentName = self.componentList.filter(function(component){ return component.name === name })[0].friendly;
+          Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
+            self.component = document.createElement(name);
 
-          for (var attrName in attrs){
-            self.component[attrName] = attrs[attrName];
-          }
-          self.appendChild(self.component);
-          // self.componentName = selection.label
-          self.setComponentObserver(); // observe changes to output of component
+            self.componentName = self.componentList.filter(function(component){ return component.name === name })[0].friendly;
+
+            for (var attrName in attrs){
+              self.component[attrName] = attrs[attrName];
+            }
+            self.appendChild(self.component);
+            // self.componentName = selection.label
+            self.setComponentObserver(); // observe changes to output of component
+          })
+        
         })
 
       },
