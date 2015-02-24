@@ -116,6 +116,7 @@
             <template if="{{showDataSelector}}">  
               <th-data-selector id="dataselector" input="{{data}}" dataFields="{{fields}}" output="{{selectedData}}"></th-data-selector>
             </template>
+            
           </core-collapse>
         </div>
 
@@ -135,8 +136,7 @@
             
             <!-- Name of component selected -->
             <template if="{{component}}">
-              <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
-              <th-u-options-editor style="height: 100%; position: absolute; top: 0; left: 0;" id="options" options="{{component | getMetaData }}" on-th-options-changed="{{componentOptionsChanged}}" selections="{{componentOptions}}"></th-u-options-editor> 
+              <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item> 
             </template>
             
             <!-- Menu of components to choose from -->
@@ -150,12 +150,16 @@
             </template>
           
           </core-collapse>
+          <template if="{{component}}">  
           <div id="chartcontainer" style="height:{{component | heightFilter }};">
+            
+              <th-u-options-editor id="options" options="{{component | getMetaData }}" on-th-options-changed="{{componentOptionsChanged}}" selections="{{componentOptions}}"></th-u-options-editor>
+            
             <!-- Component itself -->
             <content id="component"></content>  
             <core-icon icon="device:signal-cellular-0-bar" class="resize"  draggable="true"  on-dragStart="{{dragResizeStart}}" on-drag="{{dragResize}}" on-dragEnd="{{dragResizeEnd}}"></core-icon>  
           </div>
-        
+          </template>
         </div>
 
       </template>
@@ -264,10 +268,10 @@
               self.component[attrName] = attrs[attrName];
             }
             self.appendChild(self.component);
+
             // self.componentName = selection.label
             self.setComponentObserver(); // observe changes to output of component
-          })
-        
+          })        
         })
 
       },
@@ -280,6 +284,7 @@
         self.removeChild(self.component);
         self.component = null;
         self.componentName = null;
+        self.componentOptions = {};
         
       },
       /**
@@ -336,9 +341,10 @@
       getFieldsFromComponent: function(){
         var self = this;
         if (self.component && self.component.getMetaData){
-          self.showDataSelector = true;
-          var metadata = self.component.getMetaData();
-          self.fields = metadata.fields || metadata.inputAttr.chartData.fields;
+          // DISABLE WHILE WORKING ON OPTIONS EDITOR
+          // self.showDataSelector = true; 
+          // var metadata = self.component.getMetaData();
+          // self.fields = metadata.fields || metadata.inputAttr.chartData.fields;
         } else {
           self.showDataSelector = false;
         }
@@ -390,9 +396,10 @@
       },
       componentOptionsChanged: function(){
         var self = this;
-
-        for(var attr in self.componentOptions){
-          self.component[attr] = self.componentOptions[attr];
+        if (self.component){
+          for(var attr in self.componentOptions){
+            self.component[attr] = self.componentOptions[attr];
+          }
         }
       },
       /**
@@ -453,16 +460,17 @@
         
       },
       getMetaData: function(component){
-        console.log(component);
-
-        var metadata = component.getMetaData();
-        if (metadata && metadata["inputAttr"]){
-          return  metadata["inputAttr"];
+        if (component.getMetaData){
+          var metadata = component.getMetaData();
+          if (metadata["inputAttr"]){
+            return  metadata["inputAttr"];
+          } else {
+            return {};
+          }
+          // self.$.options.options = metadata ? metadata.inputAttr : {};
         } else {
           return {};
         }
-        // self.$.options.options = metadata ? metadata.inputAttr : {};
-        
       }
         
     });
