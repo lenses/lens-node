@@ -17,6 +17,7 @@
 }
 
 #view {
+  position: relative;
   padding: 5px;
 }
 
@@ -84,4 +85,12 @@ paper-toggle-button::shadow [checked] .toggle-ink {
   height: 15px;
   cursor: s-resize;
  
+}
+
+#options {
+  height: 90%; 
+  position: absolute; 
+  bottom: 0; 
+  left: 0;
+
 }

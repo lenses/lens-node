@@ -8,6 +8,7 @@
 <link rel="import" href="../core-collapse/core-collapse.html">
 <link rel="import" href="../th-data-criterion/th-data-criterion.html">
 <link rel="import" href="../th-data-selector/th-data-selector.html">
+<link rel="import" href="../th-u-options-editor/th-u-options-editor.html">
 
 <polymer-element name="th-lens-node" attributes="input output componentList type pathToComponents finalResult">
     <core-style ref="theme"></theme>
@@ -111,6 +112,7 @@
           <core-collapse id="collapse-select">
             Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
             <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{data}}"></th-data-table>
+            
             <template if="{{showDataSelector}}">  
               <th-data-selector id="dataselector" input="{{data}}" dataFields="{{fields}}" output="{{selectedData}}"></th-data-selector>
             </template>
@@ -119,7 +121,7 @@
 
         <div id="view">
            <!--<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon> -->
-          <template if="{{component}}">  
+          <template if="{{component}}"> 
             <template if="{{finalResult}}">
               <paper-toggle-button id="toggle" checked="true" on-click="{{deselectFinalResult}}" ></paper-toggle-button><span class="toggle-text">Selected </span>
             </template>
@@ -134,6 +136,7 @@
             <!-- Name of component selected -->
             <template if="{{component}}">
               <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
+              <th-u-options-editor style="height: 100%; position: absolute; top: 0; left: 0;" id="options" options="{{component | getMetaData }}" on-th-options-changed="{{componentOptionsChanged}}" selections="{{componentOptions}}"></th-u-options-editor> 
             </template>
             
             <!-- Menu of components to choose from -->
@@ -315,6 +318,8 @@
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
           self.componentOutput = self.component.output;    
         })
+
+
       },
       /**
        * filterByType is a filter for the componentList, to show only the available component options for a particular type of node
@@ -383,6 +388,13 @@
           self.$.outputTable.input = self.cloneArray(self.componentOutput);
         }
       },
+      componentOptionsChanged: function(){
+        var self = this;
+
+        for(var attr in self.componentOptions){
+          self.component[attr] = self.componentOptions[attr];
+        }
+      },
       /**
        * 'inputChanged' is an observer for input of the node
        */
@@ -438,6 +450,18 @@
       },
       heightFilter: function(value){
         return value ? "500px" : "0px";
+        
+      },
+      getMetaData: function(component){
+        console.log(component);
+
+        var metadata = component.getMetaData();
+        if (metadata && metadata["inputAttr"]){
+          return  metadata["inputAttr"];
+        } else {
+          return {};
+        }
+        // self.$.options.options = metadata ? metadata.inputAttr : {};
         
       }
         
