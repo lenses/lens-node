@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-<!-- <link rel="import" href="../th-data-table/th-data-table.html"> -->
+<link rel="import" href="../th-data-table/th-data-table.html">
 <link rel="import" href="../core-menu/core-menu.html">
 <link rel="import" href="../core-item/core-item.html">
 <link rel="import" href="../core-icons/core-icons.html">
@@ -8,6 +8,7 @@
 <link rel="import" href="../core-collapse/core-collapse.html">
 <link rel="import" href="../th-data-criterion/th-data-criterion.html">
 <link rel="import" href="../th-data-selector/th-data-selector.html">
+<link rel="import" href="../th-u-options-editor/th-u-options-editor.html">
 
 <polymer-element name="th-lens-node" attributes="input output componentList type pathToComponents finalResult">
     <core-style ref="theme"></theme>
@@ -111,15 +112,17 @@
           <core-collapse id="collapse-select">
             Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
             <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{data}}"></th-data-table>
+            
             <template if="{{showDataSelector}}">  
               <th-data-selector id="dataselector" input="{{data}}" dataFields="{{fields}}" output="{{selectedData}}"></th-data-selector>
             </template>
+            
           </core-collapse>
         </div>
 
         <div id="view">
            <!--<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon> -->
-          <template if="{{component}}">  
+          <template if="{{component}}"> 
             <template if="{{finalResult}}">
               <paper-toggle-button id="toggle" checked="true" on-click="{{deselectFinalResult}}" ></paper-toggle-button><span class="toggle-text">Selected </span>
             </template>
@@ -133,7 +136,7 @@
             
             <!-- Name of component selected -->
             <template if="{{component}}">
-              <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
+              <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item> 
             </template>
             
             <!-- Menu of components to choose from -->
@@ -147,12 +150,16 @@
             </template>
           
           </core-collapse>
+          <template if="{{component}}">  
           <div id="chartcontainer" style="height:{{component | heightFilter }};">
+            
+              <th-u-options-editor id="options" options="{{component | getMetaData }}" on-th-options-changed="{{componentOptionsChanged}}" selections="{{componentOptions}}"></th-u-options-editor>
+            
             <!-- Component itself -->
             <content id="component"></content>  
             <core-icon icon="device:signal-cellular-0-bar" class="resize"  draggable="true"  on-dragStart="{{dragResizeStart}}" on-drag="{{dragResize}}" on-dragEnd="{{dragResizeEnd}}"></core-icon>  
           </div>
-        
+          </template>
         </div>
 
       </template>
@@ -260,11 +267,10 @@
             for (var attrName in attrs){
               self.component[attrName] = attrs[attrName];
             }
+            self.componentOptions = attrs;
             self.appendChild(self.component);
-            // self.componentName = selection.label
             self.setComponentObserver(); // observe changes to output of component
-          })
-        
+          })        
         })
 
       },
@@ -277,6 +283,7 @@
         self.removeChild(self.component);
         self.component = null;
         self.componentName = null;
+        self.componentOptions = {};
         
       },
       /**
@@ -315,6 +322,8 @@
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
           self.componentOutput = self.component.output;    
         })
+
+
       },
       /**
        * filterByType is a filter for the componentList, to show only the available component options for a particular type of node
@@ -331,9 +340,10 @@
       getFieldsFromComponent: function(){
         var self = this;
         if (self.component && self.component.getMetaData){
-          self.showDataSelector = true;
-          var metadata = self.component.getMetaData();
-          self.fields = metadata.fields || metadata.inputAttr.chartData.fields;
+          // DISABLE WHILE WORKING ON OPTIONS EDITOR
+          // self.showDataSelector = true; 
+          // var metadata = self.component.getMetaData();
+          // self.fields = metadata.fields || metadata.inputAttr.chartData.fields;
         } else {
           self.showDataSelector = false;
         }
@@ -381,6 +391,14 @@
           self.output = self.cloneArray(self.componentOutput);
         } else if (self.type === "transform"){
           self.$.outputTable.input = self.cloneArray(self.componentOutput);
+        }
+      },
+      componentOptionsChanged: function(){
+        var self = this;
+        if (self.component){
+          for(var attr in self.componentOptions){
+            self.component[attr] = self.componentOptions[attr];
+          }
         }
       },
       /**
@@ -439,6 +457,19 @@
       heightFilter: function(value){
         return value ? "500px" : "0px";
         
+      },
+      getMetaData: function(component){
+        if (component.getMetaData){
+          var metadata = component.getMetaData();
+          if (metadata["inputAttr"]){
+            return  metadata["inputAttr"];
+          } else {
+            return {};
+          }
+          // self.$.options.options = metadata ? metadata.inputAttr : {};
+        } else {
+          return {};
+        }
       }
         
     });

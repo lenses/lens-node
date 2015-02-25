@@ -8,6 +8,7 @@
     "th-data-table": "thelmanews/th-data-table",
     "th-data-selector": "thelmanews/th-data-selector",
     "th-data-criterion": "thelmanews/th-data-criterion",
+    "th-u-options-editor": "thelmanews/th-u-options-editor",
     "paper-toggle-button": "Polymer/paper-toggle-button#~0.5.4",
     "core-collapse": "polymer/core-collapse#~0.5.1",
     "core-icon": "polymer/core-icon#~0.5.1",
