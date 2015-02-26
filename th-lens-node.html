@@ -235,6 +235,7 @@
           if (self.type !=="input"){ // if the component is visual, set the input to the data selector output if avail, otherwise the table data
             self.component.style.height = "100%";
             self.component.style.width = "100%";
+            self.component.showOptions = false;
             self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
           } 
             // if (self.component){
@@ -261,6 +262,7 @@
             self.component = document.createElement(name);
             self.component.style.height = "100%";
             self.component.style.width = "100%";
+            self.component.showOptions = false;
 
             self.componentName = self.componentList.filter(function(component){ return component.name === name })[0].friendly;
 
@@ -269,6 +271,7 @@
             }
             self.componentOptions = attrs;
             self.appendChild(self.component);
+            
             self.setComponentObserver(); // observe changes to output of component
           })        
         })
