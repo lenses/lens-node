@@ -61,7 +61,7 @@
           <!-- INPUT TABLE --> 
           Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggleCollapse}}"></core-icon>
           <core-collapse id="collapse-select">
-            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}"></th-data-table>
+            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}" readOnly="true"></th-data-table>
           </core-collapse>
         </div>
         
@@ -193,6 +193,7 @@
           {name: 'th-enigma', friendly: 'Enigma Data Loader', type: 'input'},
           
           {name:'th-date-convert', friendly: 'Convert Dates', type: 'transform'},
+          {name:'th-data-table-edits', friendly: 'Edit Data Manually', type: 'transform'},
           {name:'th-geocoder-firebase', friendly: 'Geocodes for Map', type: 'transform'},
           {name:'th-data-group-by', friendly: 'Group Data', type: 'transform'},
           {name:'th-data-criterion', friendly: 'Filter Data', type: 'transform'},
