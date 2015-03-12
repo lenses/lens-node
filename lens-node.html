@@ -1,19 +1,19 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../th-data-table/th-data-table.html">
+<link rel="import" href="../lens-data-table/lens-data-table.html">
 <link rel="import" href="../core-menu/core-menu.html">
 <link rel="import" href="../core-item/core-item.html">
 <link rel="import" href="../core-icons/core-icons.html">
 <link rel="import" href="../core-icons/device-icons.html">
 <link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../core-collapse/core-collapse.html">
-<link rel="import" href="../th-data-criterion/th-data-criterion.html">
+<link rel="import" href="../lens-data-filter/lens-data-filter.html">
 <link rel="import" href="../th-data-selector/th-data-selector.html">
-<link rel="import" href="../th-u-options-editor/th-u-options-editor.html">
+<link rel="import" href="../lens-u-options-editor/lens-u-options-editor.html">
 
-<polymer-element name="th-lens-node" attributes="input output componentList type pathToComponents finalResult">
+<polymer-element name="lens-node" attributes="input output componentList type pathToComponents finalResult">
     <core-style ref="theme"></theme>
     <template>
-    <link rel="stylesheet" href="th-lens-node.css">
+    <link rel="stylesheet" href="lens-node.css">
 
     <div id="node" class="{{type}}">
       <!-- Common among all nodes -->
@@ -61,7 +61,7 @@
           <!-- INPUT TABLE --> 
           Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggleCollapse}}"></core-icon>
           <core-collapse id="collapse-select">
-            <th-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}"></th-data-table>
+            <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}"></lens-data-table>
           </core-collapse>
         </div>
         
@@ -95,7 +95,7 @@
         <div id="view">
           Result (read only)<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
           <core-collapse id="collapse-view">
-            <th-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" output="{{output}}"  readOnly="true"></th-data-table>
+            <lens-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" output="{{output}}"  readOnly="true"></lens-data-table>
           </core-collapse>
         </div>
       </template>
@@ -110,8 +110,8 @@
           Data:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-select"></core-icon>
           
           <core-collapse id="collapse-select">
-            Filter Options<th-data-criterion input="{{input}}" output="{{filterOutput}}"></th-data-criterion>
-            <th-data-table id="inputTable" input="{{filterOutput || input}}" output="{{data}}"></th-data-table>
+            Filter Options<lens-data-filter input="{{input}}" output="{{filterOutput}}"></lens-data-filter>
+            <lens-data-table id="inputTable" input="{{filterOutput || input}}" output="{{data}}"></lens-data-table>
             
             <template if="{{showDataSelector}}">  
               <th-data-selector id="dataselector" input="{{data}}" dataFields="{{fields}}" output="{{selectedData}}"></th-data-selector>
@@ -153,7 +153,7 @@
           <template if="{{component}}">  
           <div id="chartcontainer" style="height:{{component | heightFilter }};">
             
-              <th-u-options-editor id="options" options="{{component | getMetaData }}" on-th-options-changed="{{componentOptionsChanged}}" selections="{{componentOptions}}"></th-u-options-editor>
+              <lens-u-options-editor id="options" options="{{component | getMetaData }}" on-th-options-changed="{{componentOptionsChanged}}" selections="{{componentOptions}}"></lens-u-options-editor>
             
             <!-- Component itself -->
             <content id="component"></content>  
@@ -168,7 +168,7 @@
   </template>
 
   <script>
-    Polymer('th-lens-node', {
+    Polymer('lens-node', {
       componentOutput: [],
       /**
        * 'type' can be 'input', 'transform', or 'visualize', referring to the type of component the node should be able to process
@@ -187,30 +187,30 @@
        * @properties: name, friendly, type
        */
       componentList: [
-          {name:'th-data-table', friendly: 'Data table', type: 'input'},
-          {name: 'th-simple-api', friendly: 'API Data Loader', type: 'input'},
-          {name:'th-csv', friendly: 'CSV Loader', type: 'input'},
-          {name: 'th-enigma', friendly: 'Enigma Data Loader', type: 'input'},
+          {name:'lens-data-table', friendly: 'Data table', type: 'input'},
+          {name: 'lens-input-simple-api', friendly: 'API Data Loader', type: 'input'},
+          {name:'lens-input-csv', friendly: 'CSV Loader', type: 'input'},
+          {name: 'lens-input-enigma', friendly: 'Enigma Data Loader', type: 'input'},
           
-          {name:'th-date-convert', friendly: 'Convert Dates', type: 'transform'},
-          {name:'th-geocoder-firebase', friendly: 'Geocodes for Map', type: 'transform'},
-          {name:'th-data-group-by', friendly: 'Group Data', type: 'transform'},
-          {name:'th-data-criterion', friendly: 'Filter Data', type: 'transform'},
-          {name:'th-data-sort', friendly: 'Sort Data', type: 'transform'},
-          {name:'th-data-split', friendly: 'Split Column', type: 'transform'},
-          {name:'th-data-join', friendly: 'Join Columns', type: 'transform'},
-          {name:'th-math-formula', friendly: 'Math & Trig Functions', type: 'transform'},
-          {name:'th-array-function', friendly: 'Map/Reduce Function (JavaScript)', type: 'transform'},
+          {name:'lens-data-convert-date', friendly: 'Convert Dates', type: 'transform'},
+          {name:'lens-data-geocoder-firebase', friendly: 'Geocodes for Map', type: 'transform'},
+          {name:'lens-data-groupby', friendly: 'Group Data', type: 'transform'},
+          {name:'lens-data-filter', friendly: 'Filter Data', type: 'transform'},
+          {name:'lens-data-sort', friendly: 'Sort Data', type: 'transform'},
+          {name:'lens-data-split', friendly: 'Split Column', type: 'transform'},
+          {name:'lens-data-join', friendly: 'Join Columns', type: 'transform'},
+          {name:'lens-data-formula', friendly: 'Math & Trig Functions', type: 'transform'},
+          {name:'lens-data-array-func', friendly: 'Map/Reduce Function (JavaScript)', type: 'transform'},
 
-          {name:'th-google-map', friendly: 'Google Map', type: 'visualize'},
-          {name:'th-mapbox', friendly: 'Mapbox Map', type: 'visualize'},
-          {name:'th-google-bar-chart', friendly: 'Google Bar Chart', type: 'visualize'},
-          {name:'th-google-line', friendly: 'Google Line Graph', type: 'visualize'},
-          {name:'th-google-scatter-bubble', friendly: 'Google Bubble Chart', type: 'visualize'},
-          {name:'th-google-pie', friendly: 'Google Pie Chart', type: 'visualize'},
-          {name:'th-line-graph-touch', friendly: 'Thelma Line Graph', type: 'visualize'},
-          {name:'th-n-bar-chart-horizontal', friendly: 'Thelma Horizontal Bar Chart', type: 'visualize'},
-          {name:'th-n-bar-chart', friendly: 'Thelma Bar Chart', type: 'visualize'}
+          {name:'lens-viz-g-map', friendly: 'Google Map', type: 'visualize'},
+          {name:'lens-viz-mapbox', friendly: 'Mapbox Map', type: 'visualize'},
+          {name:'lens-viz-g-bar-chart', friendly: 'Google Bar Chart', type: 'visualize'},
+          {name:'lens-viz-g-line-chart', friendly: 'Google Line Graph', type: 'visualize'},
+          {name:'lens-viz-g-scatter-bubble', friendly: 'Google Bubble Chart', type: 'visualize'},
+          {name:'lens-viz-g-pie-chart', friendly: 'Google Pie Chart', type: 'visualize'},
+          {name:'lens-viz-line-chart-touch', friendly: 'Thelma Line Chart', type: 'visualize'},
+          {name:'lens-viz-bar-chart-horizontal', friendly: 'Thelma Horizontal Bar Chart', type: 'visualize'},
+          {name:'lens-viz-bar-chart', friendly: 'Thelma Bar Chart', type: 'visualize'}
       ],
       domReady: function() {
         var self = this;
