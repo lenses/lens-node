@@ -110,7 +110,7 @@
           Data:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-select"></core-icon>
           
           <core-collapse id="collapse-select">
-            Filter Options<lens-data-filter input="{{input}}" output="{{filterOutput}}"></lens-data-filter>
+            <!-- Filter Options<lens-data-filter input="{{input}}" output="{{filterOutput}}"></lens-data-filter> -->
             <lens-data-table id="inputTable" input="{{filterOutput || input}}" output="{{data}}"></lens-data-table>
             
             <template if="{{showDataSelector}}">  
@@ -202,6 +202,7 @@
           {name:'lens-data-formula', friendly: 'Math & Trig Functions', type: 'transform'},
           {name:'lens-data-array-func', friendly: 'Map/Reduce Function (JavaScript)', type: 'transform'},
 
+          {name:'lens-viz-am-combo-chart', friendly: 'Bar/Line Combo Chart', type: 'visualize'},
           {name:'lens-viz-g-map', friendly: 'Google Map', type: 'visualize'},
           {name:'lens-viz-mapbox', friendly: 'Mapbox Map', type: 'visualize'},
           {name:'lens-viz-g-bar-chart', friendly: 'Google Bar Chart', type: 'visualize'},
