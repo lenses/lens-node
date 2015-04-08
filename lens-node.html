@@ -152,8 +152,16 @@
           </core-collapse>
           <template if="{{component}}">  
           <div id="chartcontainer" style="height:{{component | heightFilter }};">
-            
+            <div id="optionsContainer" class="optionsContainer closed" style="display: {{component | optionsDisplayFilter}}">
+              <template if="{{!menuOpened}}">
+                <core-icon id="open" on-click="{{openOptions}}" icon="chevron-right"></core-icon>
+              </template>
+              <template if="{{menuOpened}}">
+                <core-icon id="close" on-click="{{closeOptions}}" icon="chevron-left"></core-icon>
+              </template>
               <lens-u-options-editor id="options" options="{{component | getMetaData }}" on-th-options-changed="{{componentOptionsChanged}}" selections="{{componentOptions}}"></lens-u-options-editor>
+            </div>
+              
             
             <!-- Component itself -->
             <content id="component"></content>  
@@ -181,6 +189,7 @@
        * @type {String}
        */
       pathToComponents: '../',
+      menuOpened: false,
       /**
        * 'componentList' list of components that can be added to any type of node
        * @type {Array}
@@ -471,6 +480,27 @@
         } else {
           return {};
         }
+      },
+      optionsDisplayFilter: function(component){
+        console.log(component);
+        var options = this.getMetaData(component);
+        if (options && Object.keys(options).length){
+          return "block"
+        } else {
+          return "none";
+        }
+      },
+      openOptions: function(){
+        var self = this;
+        self.menuOpened = true;
+        // console.log(self.shadowRoot.querySelector());
+        self.shadowRoot.querySelector('#optionsContainer').classList.remove('closed');
+
+      },
+      closeOptions: function(){
+        var self = this;
+        self.menuOpened = false;
+        self.shadowRoot.querySelector('#optionsContainer').classList.add('closed');
       }
         
     });

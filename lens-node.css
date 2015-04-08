@@ -23,6 +23,7 @@
 #chartcontainer {
   position: relative;
   width: 100%;
+  overflow-x: hidden;
 }
 
 core-item::shadow #label{
@@ -84,4 +85,30 @@ paper-toggle-button::shadow [checked] .toggle-ink {
   width: 15px;
   height: 15px;
   cursor: s-resize;
+}
+
+.optionsContainer {
+  margin-left: 0;
+  width: 300px;
+  height: 100%;
+  position: absolute;
+  transition: 1s;
+  z-index: 1001;
+}
+
+.closed {
+  transition: 1s;
+  margin-left: -300px;
+}
+
+#open, #close {
+  position: absolute;
+  top: 45%;
+  right: -25px;
+  width: 25px;
+  height: 25px;
+  background-color: #536482;
+  color: white;
+  cursor: pointer;
+  z-index: 1001;
 }
