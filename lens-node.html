@@ -310,7 +310,10 @@
           self.component.animateOnInit = true;
           self.component.style.width = "100%";
           self.getFieldsFromComponent();
-          // self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
+          if (self.type === 'visualize') {
+            self.component.input = self.data; // recent add on - sometimes the chart was not getting any input
+          }
+          
         } else {
           switch(self.type){
             case "input":
