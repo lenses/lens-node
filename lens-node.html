@@ -3,7 +3,7 @@
 <link rel="import" href="../lens-data-table/lens-data-table.html">
 <link rel="import" href="../lens-u-options-editor/lens-u-options-editor.html">
 
-<polymer-element name="lens-node" attributes="input output componentList type finalResult components">
+<polymer-element name="lens-node" attributes="input output componentList type finalResult">
   <template>
     <core-style ref="theme"></core-style>
     <link rel="stylesheet" href="lens-node.css">
@@ -11,7 +11,7 @@
     <!-------------------------------- INPUT NODE START -------------------------------->
     <template if="{{type==='input'}}">
       
-        <h3><template if="{{components.length}}"> {{components[0].friendly}}</template></h3>
+      <h3><template if="{{components.length}}"> {{components[0].friendly}}</template></h3>
       
       <div class="table-container">
         <lens-data-table id="inputTable" minRows="20" minCols="7" output="{{data}}"></lens-data-table>
@@ -44,6 +44,22 @@
   <script>
     Polymer({
       components:[],
+      ready: function(){
+        // Observe a single change.
+        this.onMutation(this, this.childrenUpdated);
+      },
+      childrenUpdated: function(observer, mutations) {
+        this.components = [].map.call(this.children, function(component){
+          return {
+            tag: component,
+            name: component.tagName.toLowerCase(),
+            friendly: component.dataset.friendly
+          }
+
+        })
+        
+        // this.onMutation(this, this.childrenUpdated);
+      },
       /**
        * 'addElement' callback to when an element is clicked on; element is imported, initialized and appended to the DOM
        * @param {[type]} 'selection' is the element clicked 
@@ -69,9 +85,10 @@
           // self.getFieldsFromComponent();
           // self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
         // }
-
+          newEl.setAttribute('data-friendly', selection.label);
           self.appendChild(newEl);
-          self.components.push({name: name, friendly: selection.label ,tag: newEl})
+
+          // self.components.push({name: name, friendly: selection.label ,tag: newEl})
           // self.componentName = selection.label
           // self.setComponentObserver(); // observe changes to output of component
         })
