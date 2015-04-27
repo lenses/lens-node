@@ -19,7 +19,7 @@
       
       <!-- Common among all nodes -->
       <template if="{{!component}}">
-        <core-menu id="component-list">
+        <core-menu id="component-list" horizontal layout wrap>
           <template repeat="{{component in componentList | filterByType}}">
             <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}" data-node-type="{{component.type}}"></core-item>
           </template>
@@ -279,9 +279,9 @@
        */
       filterByType: function(value){
         var self = this;
-        console.log(self.type)
+        // console.log(self.type)
         var componentList = value.filter(function(component){ return self.type ? component.type === self.type : true;});
-        console.log(componentList);
+        // console.log(componentList);
         return componentList;
       },
       /**
@@ -341,7 +341,7 @@
         if (self.type === "input") {
           self.output = self.cloneArray(self.componentOutput);
         } else if (self.type === "transform"){
-          self.$.outputTable.input = self.cloneArray(self.componentOutput);
+          self.shadowRoot.querySelector('#outputTable').input = self.cloneArray(self.componentOutput);
         }
       },
       componentOptionsChanged: function(){

@@ -8,7 +8,6 @@
 }
 
 #select, #transform {
-  /*min-height: 200px;*/
   border-bottom: 3px solid #eee;
   padding: 5px;
 }
@@ -23,10 +22,15 @@
   overflow-x: hidden;
 }
 
+core-item {
+  margin: 0 5px;
+}
+
 core-item::shadow #label{
   padding: 5px;
   background-color: #eee;
   cursor: pointer;
+  display: inline-block;
 }
 
 .heading {
@@ -35,7 +39,7 @@ core-item::shadow #label{
   padding: 5px;
 }
 .input, .transform, .visualize {
-  border: 3px solid #eee;
+  /*border: 3px solid #eee;*/
 }
 
 #toggle {
