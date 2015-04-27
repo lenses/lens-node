@@ -20,7 +20,8 @@
       <!-- Common among all nodes -->
       <template if="{{!component}}">
         <core-menu id="component-list" horizontal layout wrap>
-          <template repeat="{{component in componentList | filterByType}}">
+          
+          <template repeat="{{component in componentList}}">
             <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}" data-node-type="{{component.type}}"></core-item>
           </template>
         </core-menu>
@@ -42,19 +43,21 @@
             {{componentName}}
           </div>
           
-          <!-- INPUT TABLE --> 
+          <!-- DATA TABLE --> 
           <div id="select">
-            <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}"></lens-data-table>
+            <template if="{{!showOutput}}">
+              <!-- <paper-toggle-button id="toggle" checked="false" on-click="{{_showOutput}}" ></paper-toggle-button><span class="toggle-text">Data Before </span> -->
+              <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}"></lens-data-table>
+            </template>
+            <template if="{{showOutput}}">
+              <!-- <paper-toggle-button id="toggle" checked="true" on-click="{{_showInput}}" ></paper-toggle-button><span class="toggle-text">Data After </span> -->
+              <lens-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" input="{{componentOutput}}" output="{{output}}" ></lens-data-table>
+            </template>
           </div>
-          
+
           <!-- COMPONENT --> 
           <div id="transform">
             <content id="component"></content>
-          </div>
-          
-          <!-- OUTPUT TABLE --> 
-          <div id="view">
-            <lens-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" output="{{output}}"  readOnly="true"></lens-data-table>
           </div>
         </template>
 
@@ -128,33 +131,33 @@
        * @type {Array}
        * @properties: name, friendly, type
        */
-      componentList: [
-          {name:'lens-data-table', friendly: 'Data table', type: 'input'},
-          {name: 'lens-input-simple-api', friendly: 'API Data Loader', type: 'input'},
-          {name:'lens-input-csv', friendly: 'CSV Loader', type: 'input'},
-          {name: 'lens-input-enigma', friendly: 'Enigma Data Loader', type: 'input'},
+      // componentList: [
+      //     {name:'lens-data-table', friendly: 'Data table', type: 'input'},
+      //     {name: 'lens-input-simple-api', friendly: 'API Data Loader', type: 'input'},
+      //     {name:'lens-input-csv', friendly: 'CSV Loader', type: 'input'},
+      //     {name: 'lens-input-enigma', friendly: 'Enigma Data Loader', type: 'input'},
           
-          {name:'lens-data-convert-date', friendly: 'Convert Dates', type: 'transform'},
-          {name:'lens-data-geocoder-firebase', friendly: 'Geocodes for Map', type: 'transform'},
-          {name:'lens-data-groupby', friendly: 'Group Data', type: 'transform'},
-          {name:'lens-data-filter', friendly: 'Filter Data', type: 'transform'},
-          {name:'lens-data-sort', friendly: 'Sort Data', type: 'transform'},
-          {name:'lens-data-split', friendly: 'Split Column', type: 'transform'},
-          {name:'lens-data-join', friendly: 'Join Columns', type: 'transform'},
-          {name:'lens-data-formula', friendly: 'Math & Trig Functions', type: 'transform'},
-          {name:'lens-data-array-func', friendly: 'Map/Reduce Function (JavaScript)', type: 'transform'},
+      //     {name:'lens-data-convert-date', friendly: 'Convert Dates', type: 'transform'},
+      //     {name:'lens-data-geocoder-firebase', friendly: 'Geocodes for Map', type: 'transform'},
+      //     {name:'lens-data-groupby', friendly: 'Group Data', type: 'transform'},
+      //     {name:'lens-data-filter', friendly: 'Filter Data', type: 'transform'},
+      //     {name:'lens-data-sort', friendly: 'Sort Data', type: 'transform'},
+      //     {name:'lens-data-split', friendly: 'Split Column', type: 'transform'},
+      //     {name:'lens-data-join', friendly: 'Join Columns', type: 'transform'},
+      //     {name:'lens-data-formula', friendly: 'Math & Trig Functions', type: 'transform'},
+      //     {name:'lens-data-array-func', friendly: 'Map/Reduce Function (JavaScript)', type: 'transform'},
 
-          {name:'lens-viz-am-combo-chart', friendly: 'Bar/Line Combo Chart', type: 'visualize'},
-          {name:'lens-viz-g-map', friendly: 'Google Map', type: 'visualize'},
-          {name:'lens-viz-mapbox', friendly: 'Mapbox Map', type: 'visualize'},
-          {name:'lens-viz-g-bar-chart', friendly: 'Google Bar Chart', type: 'visualize'},
-          {name:'lens-viz-g-line-chart', friendly: 'Google Line Graph', type: 'visualize'},
-          {name:'lens-viz-g-scatter-bubble', friendly: 'Google Bubble Chart', type: 'visualize'},
-          {name:'lens-viz-g-pie-chart', friendly: 'Google Pie Chart', type: 'visualize'},
-          {name:'lens-viz-line-chart-touch', friendly: 'Thelma Line Chart', type: 'visualize'},
-          {name:'lens-viz-bar-chart-horizontal', friendly: 'Thelma Horizontal Bar Chart', type: 'visualize'},
-          {name:'lens-viz-bar-chart', friendly: 'Thelma Bar Chart', type: 'visualize'}
-      ],
+      //     {name:'lens-viz-am-combo-chart', friendly: 'Bar/Line Combo Chart', type: 'visualize'},
+      //     {name:'lens-viz-g-map', friendly: 'Google Map', type: 'visualize'},
+      //     {name:'lens-viz-mapbox', friendly: 'Mapbox Map', type: 'visualize'},
+      //     {name:'lens-viz-g-bar-chart', friendly: 'Google Bar Chart', type: 'visualize'},
+      //     {name:'lens-viz-g-line-chart', friendly: 'Google Line Graph', type: 'visualize'},
+      //     {name:'lens-viz-g-scatter-bubble', friendly: 'Google Bubble Chart', type: 'visualize'},
+      //     {name:'lens-viz-g-pie-chart', friendly: 'Google Pie Chart', type: 'visualize'},
+      //     {name:'lens-viz-line-chart-touch', friendly: 'Thelma Line Chart', type: 'visualize'},
+      //     {name:'lens-viz-bar-chart-horizontal', friendly: 'Thelma Horizontal Bar Chart', type: 'visualize'},
+      //     {name:'lens-viz-bar-chart', friendly: 'Thelma Bar Chart', type: 'visualize'}
+      // ],
       domReady: function() {
         var self = this;
         self.fire('dom-ready');
@@ -268,22 +271,32 @@
        */
       setComponentObserver: function(){
         var self = this;
+
+
+
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
+          var inputStr = JSON.stringify(self.input);
+          var outputStr = JSON.stringify(self.component.output);
+          if (inputStr != outputStr){
+            self.showOutput = true;
+          }
           self.componentOutput = self.component.output;    
         })
 
 
       },
-      /**
-       * filterByType is a filter for the componentList, to show only the available component options for a particular type of node
-       */
-      filterByType: function(value){
-        var self = this;
-        // console.log(self.type)
-        var componentList = value.filter(function(component){ return self.type ? component.type === self.type : true;});
-        // console.log(componentList);
-        return componentList;
-      },
+      // /**
+      //  * filterByType is a filter for the componentList, to show only the available component options for a particular type of node
+      //  */
+      // filterByType: function(value){
+      //   var self = this;
+      //   console.log("****");
+      //   console.log(self.type)
+        
+      //   var componentList = value.filter(function(component){ return self.type ? component.type === self.type : true;});
+      //   // console.log(componentList);
+      //   return componentList;
+      // },
       /**
        * 'getFieldsFromComponent' 
        * @return {[type]} [description]
@@ -341,6 +354,13 @@
         if (self.type === "input") {
           self.output = self.cloneArray(self.componentOutput);
         } else if (self.type === "transform"){
+// console.log("****");
+//           console.log(self.componentOutput);
+          var inputStr = JSON.stringify(self.input);
+          var outputStr = JSON.stringify(self.componentOutput);
+          if (inputStr != outputStr){
+            self.showOutput = true;
+          }
           self.shadowRoot.querySelector('#outputTable').input = self.cloneArray(self.componentOutput);
         }
       },
