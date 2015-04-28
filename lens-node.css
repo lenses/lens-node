@@ -1,5 +1,5 @@
 
-#node{
+#node{ /* main container */
   width: 100%;
   background-color: white;
   margin: 0 auto;
@@ -8,22 +8,38 @@
   border-radius: 5px;
 }
 
-#select, #transform {
+.heading {
+  color: black;
+  font-weight: 600;
+  padding: 5px;
+  text-align: center;
+}
+
+#data-container { 
   border-bottom: 3px solid #eee;
   padding: 5px;
 }
 
-#view {
+#component-container {
   padding: 5px;
 }
 
-#chartcontainer {
+#chart-container {
   position: relative;
   width: 100%;
   overflow-x: hidden;
 }
 
-core-item {
+.optionsContainer {
+  margin-left: 0;
+  width: 300px;
+  height: 100%;
+  position: absolute;
+  transition: 1s;
+  z-index: 1001;
+}
+
+core-item { /* component icon within list of components */
   margin: 0 5px;
 }
 
@@ -34,21 +50,11 @@ core-item::shadow #label{
   display: inline-block;
 }
 
-.heading {
-  color: black;
-  font-weight: 600;
-  padding: 5px;
-  text-align: center;
-}
-.input, .transform, .visualize {
-  /*border: 3px solid #eee;*/
-}
-
-#toggle {
+#toggle { /* final result switch */
   float: right;
 }
 
-.toggle-text {
+.toggle-text { /* text next to final result switch */
   float: right;
   margin: 0px 5px;
 }
@@ -61,7 +67,7 @@ paper-toggle-button::shadow [checked] .toggle-ink {
   color: #536482;
 }
 
-.resize {
+.resize { /* resize icon in visual node */
   position: absolute;
   right: -3px;
   bottom: -3px;
@@ -70,16 +76,7 @@ paper-toggle-button::shadow [checked] .toggle-ink {
   cursor: s-resize;
 }
 
-.optionsContainer {
-  margin-left: 0;
-  width: 300px;
-  height: 100%;
-  position: absolute;
-  transition: 1s;
-  z-index: 1001;
-}
-
-.closed {
+.closed { /*  */
   transition: 1s;
   margin-left: -300px;
 }
