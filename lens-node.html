@@ -8,7 +8,7 @@
 <link rel="import" href="../lens-data-filter/lens-data-filter.html">
 <link rel="import" href="../lens-u-options-editor/lens-u-options-editor.html">
 
-<polymer-element name="lens-node" attributes="input output componentList type pathToComponents finalResult">
+<polymer-element name="lens-node" attributes="input output componentList type finalResult">
     <core-style ref="theme"></theme>
     <template>
     <link rel="stylesheet" href="lens-node.css">
@@ -19,7 +19,7 @@
       <template if="{{!component}}">
         <core-menu id="component-list" horizontal layout wrap>
           <template repeat="{{component in componentList}}">
-            <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}" data-node-type="{{component.type}}"></core-item>
+            <core-item class="{{component.name}}" on-click="{{addNewElement}}" label="{{component.friendly}}" data-node-type="{{component.type}}"></core-item>
           </template>
         </core-menu>
       </template>
@@ -50,10 +50,10 @@
           <!-- Data table (input & output) --> 
           <div id="data-container">
             <template if="{{!showOutput}}">
-              <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}"></lens-data-table>
+              <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{input}}" output="{{componentData}}"></lens-data-table>
             </template>
             <template if="{{showOutput}}">
-              <lens-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" input="{{componentOutput}}" output="{{output}}" ></lens-data-table>
+              <lens-data-table id="outputTable" firstRowIsHeader="{{firstRow}}" input="{{componentOutput}}" output="{{output}}" ></lens-data-table>
             </template>
           </div>
 
@@ -69,7 +69,7 @@
           <!-- Data Table -->
           <div id="data-container">
             <!-- Filter Options<lens-data-filter input="{{input}}" output="{{filterOutput}}"></lens-data-filter> -->
-            <lens-data-table id="inputTable" input="{{filterOutput || input}}" output="{{data}}"></lens-data-table>
+            <lens-data-table id="inputTable" input="{{filterOutput || input}}" output="{{componentData}}"></lens-data-table>
           </div>
 
           <div id="component-container">
@@ -89,10 +89,10 @@
 
               <!-- Options editor -->
               <div id="optionsContainer" class="optionsContainer closed" style="display: {{component | optionsDisplayFilter}}">
-                <template if="{{!menuOpened}}">
+                <template if="{{!showOptions}}">
                   <core-icon id="open" on-click="{{openOptions}}" icon="chevron-right"></core-icon>
                 </template>
-                <template if="{{menuOpened}}">
+                <template if="{{showOptions}}">
                   <core-icon id="close" on-click="{{closeOptions}}" icon="chevron-left"></core-icon>
                 </template>
                 <lens-u-options-editor id="options" options="{{component | getMetaData }}" on-th-options-changed="{{componentOptionsChanged}}" selections="{{componentOptions}}"></lens-u-options-editor>
@@ -113,47 +113,87 @@
 
   <script>
     Polymer('lens-node', {
-      componentOutput: [],
       /**
-       * 'type' can be 'input', 'transform', or 'visualize', referring to the type of component the node should be able to process
-       * @type {String}
+       * Input data
+       *
+       * @property input
+       * @type array of objects
+       * @default undefined
+       */
+
+      /**
+       * Output data
+       *
+       * @property output
+       * @type object
+       * @default undefined
+       */
+      
+      /**
+       * Type of node
+       * Options are:
+       *   - 'input'
+       *   - 'transform'
+       *   - 'visualize'
+       *
+       * @property type
+       * @type array of objects
+       * @default undefined
+       */
+      
+      /**
+       * Component List
+       *
+       * @property componentList
+       * @type array of objects
+       * @default undefined
+       */
+      
+      /**
+       * Final Result is a boolean that flags the component in the node as the final result (only applicable to visualize nodes)
+       * 
+       * @property finalResult
+       * @type {Boolean}
+       * @default false
        */
       finalResult: false,
-      // type: 'transform',
-      menuOpened: false,
+      /**
+       * Show Options is a boolean that informs whether or not the component options are visible (only applicable to visual nodes)
+       * 
+       * @property showOptions
+       * @type {Boolean}
+       */
+      showOptions: false,
+      componentOutput: [],
       domReady: function() {
         var self = this;
         self.fire('dom-ready');
-        // Find the child component if exists
+        
+        // Find the child component if they exist
         self.component = self.$.component ? self.$.component.getDistributedNodes()[1] : null;
       },
       /**
-       * 'addElement' callback to when an element is clicked on; element is imported, initialized and appended to the DOM
+       * 'addNewElement' callback to when an element is clicked on; element is imported, initialized and appended to the DOM
        * @param {[type]} 'selection' is the element clicked 
        */
-      addElement: function(e, detail, selection){
+      addNewElement: function(e, detail, selection){
         var self = this,
             name = selection.className,
-
             directory =  "../" + name + "/" + name + ".html",
             pathToEl = this.resolvePath(directory); // construct path to component
-        console.log(pathToEl)
+        
+        // Set node type based on component selected
         self.type = selection.dataset.nodeType;
         
         // Dynamically create HTML import for component
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
-          if (self.type !=="input"){ // if the component is visual, set the input to the data selector output if avail, otherwise the table data
+          if (self.type !=="input"){ 
             self.component.style.height = "100%";
             self.component.style.width = "100%";
-            self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
+            self.component.input = self.cloneArray(self.componentData);
 
           } 
-            // if (self.component){
-          // self.component.animateOnInit = true;
-          // self.component.style.width = "100%";
-          // self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
-        // }
 
           self.appendChild(self.component);
           self.componentName = selection.label
@@ -161,14 +201,18 @@
         })
         
       },
+      /**
+       * 'createElementFromSavedData' creates a component given the name of the element and an object of attributes and values
+       * @param  {String} name  example: 'lens-input-csv'
+       * @param  {Object} attrs 
+       */
       createElementFromSavedData: function(name, attrs){
         var self = this,
-            directory = self.pathToComponents + name + "/" + name + ".html",
+            directory = "../" + name + "/" + name + ".html",
             pathToEl = this.resolvePath(directory); // construct path to component
 
         self.addEventListener('dom-ready', function(){
-
-          Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
+          Polymer.import([pathToEl], function(){
             self.component = document.createElement(name);
             self.component.style.height = "100%";
             self.component.style.width = "100%";
@@ -183,19 +227,6 @@
             self.setComponentObserver(); // observe changes to output of component
           })        
         })
-
-      },
-      /**
-       * removeElement removes the component from the page 
-       * @param {[type]} 'selection' is the element clicked 
-       */
-      removeElement: function(e, detail, selection){
-        var self = this;
-        self.removeChild(self.component);
-        self.component = null;
-        self.componentName = null;
-        self.componentOptions = {};
-        
       },
       /**
        * 'cloneArray' If argument is an array, it returns a clone of it, otherwise returns undefined
@@ -205,37 +236,15 @@
       cloneArray: function(arr){
         return arr && arr.constructor === Array ?  [].map.call(arr, function(item){ return item; }) : undefined;
       },
-      componentChanged: function(){
-        var self = this;
-        if (self.component){
-          self.component.animateOnInit = true;
-          self.component.style.width = "100%";
-          if (self.type === 'visualize') {
-            self.component.input = self.data; // recent add on - sometimes the chart was not getting any input
-          }
-          
-        } else {
-          switch(self.type){
-            case "input":
-              self.output = self.cloneArray(self.input);
-              break;
-            case "transform":
-              self.$.outputTable.input = self.cloneArray(self.data);
-              break;
-            default:
-              break;
-          }
-        }
-      },
       /**
        * 'setComponentObserver' sets up an observer for changes in the output of the component and binds the new value to componentOutput
        */
       setComponentObserver: function(){
         var self = this;
 
-
-
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
+          
+          // If the input is different than component output, set showOutput to true to switch which data is displayed in the table
           var inputStr = JSON.stringify(self.input);
           var outputStr = JSON.stringify(self.component.output);
           if (inputStr != outputStr){
@@ -243,38 +252,27 @@
           }
           self.componentOutput = self.component.output;    
         })
-
-
       },
       /**
-       * 'dataChanged' is an observer for output of input data table
+       * 'componentDataChanged' is an observer for the input data to a component in transform and visual nodes
        */
-      dataChanged: function(){
+      componentDataChanged: function(){
           var self = this;
 
-          // If there's a component (and data in the table)
-          if (self.component && self.data.length > 0){
-            // Pass data through selector before hitting component, if necessary
-
-              self.component.input = self.cloneArray(self.data);
+          // If there's a component and data in the table
+          if (self.component && self.componentData.length > 0){
+            // set the component input to that data
+            self.component.input = self.cloneArray(self.componentData);
             
-
           // Otherwise bind any data in the input table straight to the output table 
           } else if (self.$.outputTable && !self.component){
-            self.$.outputTable.input = self.cloneArray(self.data);
+            self.$.outputTable.input = self.cloneArray(self.componentData);
           }
 
           // Set output of visual node 
           if(self.type=="visualize"){
             self.output = self.cloneArray(self.input);
           }
-      },
-      /**
-       * 'selectedDataChanged' is an observer for output of data selector 
-       */
-      selectedDataChanged: function(newValue, oldValue){
-        var self = this;
-        self.component.input = self.cloneArray(newValue);
       },
       /**
        * 'componentOutputChanged' is an observer for output of the component
@@ -284,21 +282,16 @@
         if (self.type === "input") {
           self.output = self.cloneArray(self.componentOutput);
         } else if (self.type === "transform"){
-// console.log("****");
-//           console.log(self.componentOutput);
           var inputStr = JSON.stringify(self.input);
           var outputStr = JSON.stringify(self.componentOutput);
           if (inputStr != outputStr){
-           // alert()
             self.showOutput = true;
-            var table = self.shadowRoot.querySelector('#outputTable');
-            if(table){
-              table.input = self.cloneArray(self.componentOutput);
-            }
           }
-          
         }
       },
+      /**
+       * 'componentOptionsChanged' is an observer that reassigns the component options to the component when they change
+       */
       componentOptionsChanged: function(){
         var self = this;
         if (self.component){
@@ -312,20 +305,10 @@
        */
       inputChanged: function(){
         var self = this;
-        // If data in a previous node changes, it should flow through to all visual nodes
-        // Set output of visual node 
+        // If data in a previous node changes, it should flow through all visual nodes
         if(self.type=="visualize"){
           self.output = self.cloneArray(self.input);
         }
-      },
-      /**
-       * 'toggleCollapse' toggles the collapse state of the selection
-       */
-      toggleCollapse: function(e, detail, selection){
-        var self = this;
-        var target = selection.dataset.target;        
-        e.stopPropagation();
-        self.shadowRoot.querySelector('#'+target).toggle();
       },
       /**
        * 'selectFinalResult' callback to when the final result switch for a particular graph is clicked. 
@@ -349,14 +332,15 @@
         self.startY = e.y;
       },
       dragResize: function(e, detail, selection){
-        var self = this;
-        var movement = e.y - self.startY;
+        var self = this,
+            movement = e.y - self.startY;
+
         selection.parentNode.style.height = self.chartHeight + movement + 'px';
-      
       },
       dragResizeEnd: function(e, detail, selection){
-        var self = this;
-        var movement = e.y - self.startY; 
+        var self = this,
+            movement = e.y - self.startY; 
+
         selection.parentNode.style.height = self.chartHeight + movement + 'px';
         self.component.resize();
       },
@@ -388,15 +372,52 @@
       },
       openOptions: function(){
         var self = this;
-        self.menuOpened = true;
-        // console.log(self.shadowRoot.querySelector());
+        self.showOptions = true;
         self.shadowRoot.querySelector('#optionsContainer').classList.remove('closed');
-
       },
       closeOptions: function(){
         var self = this;
-        self.menuOpened = false;
+        self.showOptions = false;
         self.shadowRoot.querySelector('#optionsContainer').classList.add('closed');
+      },
+      
+      //***  NOT IN USE ***//
+
+      /**
+       * 'componentChanged' is an observer for the component attr
+       */
+      componentChanged: function(){
+        var self = this;
+        if (self.component){
+          // self.component.animateOnInit = true;
+          // self.component.style.width = "100%";
+          // if (self.type === 'visualize') {
+          //   self.component.input = self.componentData; // recent add on - sometimes the chart was not getting any input
+          // }
+          
+        } else {
+          switch(self.type){
+            case "input":
+              // self.output = self.cloneArray(self.input);
+              break;
+            case "transform":
+              // self.$.outputTable.input = self.cloneArray(self.componentData);
+              break;
+            default:
+              break;
+          }
+        }
+      },
+      /**
+       * 'removeElement' removes the component from the node 
+       */
+      removeElement: function(){
+        var self = this;
+        self.removeChild(self.component);
+        self.component = null;
+        self.componentName = null;
+        self.componentOptions = {};
+        self.componentOutput = [];
       }
         
     });
