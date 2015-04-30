@@ -63,6 +63,36 @@
           </div>
         </template>
 
+        <!-------------------------------- JOIN NODE -------------------------------->
+        <template if="{{type==='join'}}">
+
+          <!-- Data table (input & output) --> 
+          <div id="data-container">
+            <template if="{{!showOutput}}">
+              <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{input}}" output="{{componentData}}"></lens-data-table>
+            </template>
+            <template if="{{showOutput}}">
+              <lens-data-table id="outputTable" firstRowIsHeader="{{firstRow}}" input="{{componentOutput}}" output="{{output}}" ></lens-data-table>
+            </template>
+          </div>
+          
+          <!-- Choose track -->
+          <label class="label" for="func_selector">Track to join:</label>
+          <core-selector class="selector" id="track-selector" selected="{{dataSetIndex}}" valueattr="label">
+            <template repeat="{{dataset, index in dataSets}}">
+              <template if="{{dataset}}">
+                <div class="col" label="{{index}}">Track {{index+1}}</div>
+              </template>
+            </template>
+          </core-selector>
+
+          <!-- Component itself --> 
+          <div id="component-container">
+            <content id="component"></content>
+          </div>
+        </template>
+
+
         <!-------------------------------- VISUALIZE NODE -------------------------------->
         <template if="{{type==='visualize'}}">
 
@@ -199,6 +229,9 @@
           self.componentName = selection.label
           self.setComponentObserver(); // observe changes to output of component
         })
+        if(self.type == "join"){
+          self.getDatasets();
+        }
         
       },
       /**
@@ -281,7 +314,7 @@
         var self = this;
         if (self.type === "input") {
           self.output = self.cloneArray(self.componentOutput);
-        } else if (self.type === "transform"){
+        } else if (self.type === "transform" || self.type === "join"){
           var inputStr = JSON.stringify(self.input);
           var outputStr = JSON.stringify(self.componentOutput);
           if (inputStr != outputStr){
@@ -418,6 +451,19 @@
         self.componentName = null;
         self.componentOptions = {};
         self.componentOutput = [];
+      },
+      getDatasets: function(){
+        var self = this;
+        var tracks = self.parentNode.tracks;
+
+        self.dataSets = tracks.map(function(track){
+          return track[track.length-1].tag.output;
+        })
+
+        console.log(self.dataSets);
+      },
+      dataSetIndexChanged: function(){
+        this.component.input_aux = this.dataSets[this.dataSetIndex];
       }
         
     });
