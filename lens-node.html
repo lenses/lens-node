@@ -223,7 +223,9 @@
             self.component.style.width = "100%";
             self.component.input = self.cloneArray(self.componentData);
 
-          } 
+          } else {
+            self.component.input = [[]];
+          }
 
           self.appendChild(self.component);
           self.componentName = selection.label
