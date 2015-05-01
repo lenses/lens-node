@@ -30,23 +30,29 @@
         
         <!-------------------------------- INPUT NODE -------------------------------->
         <template if="{{type==='input'}}">
-      
+                   
+          <!-- Component itself -->
+          <div id="component-container">
+            <content id="component"></content>
+          </div>
+          
           <!-- Data Table -->
           <template if="{{component.tagName != 'LENS-DATA-TABLE' && componentOutput.length}}">
             <div id="data-container">
               <lens-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" input="{{componentOutput}}" output="{{output}}" ></lens-data-table>
             </div>
           </template>
-          
-          <!-- Component itself -->
-          <div id="component-container">
-            <content id="component"></content>
-          </div>
+ 
         </template>
 
         <!-------------------------------- TRANSFORM NODE -------------------------------->
         <template if="{{type==='transform'}}">
 
+          <!-- Component itself --> 
+          <div id="component-container">
+            <content id="component"></content>
+          </div>
+
           <!-- Data table (input & output) --> 
           <div id="data-container">
             <template if="{{!showOutput}}">
@@ -57,25 +63,11 @@
             </template>
           </div>
 
-          <!-- Component itself --> 
-          <div id="component-container">
-            <content id="component"></content>
-          </div>
         </template>
 
         <!-------------------------------- JOIN NODE -------------------------------->
         <template if="{{type==='join'}}">
 
-          <!-- Data table (input & output) --> 
-          <div id="data-container">
-            <template if="{{!showOutput}}">
-              <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{input}}" output="{{componentData}}"></lens-data-table>
-            </template>
-            <template if="{{showOutput}}">
-              <lens-data-table id="outputTable" firstRowIsHeader="{{firstRow}}" input="{{componentOutput}}" output="{{output}}" ></lens-data-table>
-            </template>
-          </div>
-          
           <!-- Choose track -->
           <label class="label" for="func_selector">Track to join:</label>
           <core-selector class="selector" id="track-selector" selected="{{dataSetIndex}}" valueattr="label">
@@ -90,19 +82,23 @@
           <div id="component-container">
             <content id="component"></content>
           </div>
+
+          <!-- Data table (input & output) --> 
+          <div id="data-container">
+            <template if="{{!showOutput}}">
+              <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{input}}" output="{{componentData}}"></lens-data-table>
+            </template>
+            <template if="{{showOutput}}">
+              <lens-data-table id="outputTable" firstRowIsHeader="{{firstRow}}" input="{{componentOutput}}" output="{{output}}" ></lens-data-table>
+            </template>
+          </div>
+
         </template>
 
 
         <!-------------------------------- VISUALIZE NODE -------------------------------->
         <template if="{{type==='visualize'}}">
-
-          <!-- Data Table -->
-          <div id="data-container">
-            <!-- Filter Options<lens-data-filter input="{{input}}" output="{{filterOutput}}"></lens-data-filter> -->
-            <lens-data-table id="inputTable" input="{{filterOutput || input}}" output="{{componentData}}"></lens-data-table>
-          </div>
-
-          <div id="component-container">
+           <div id="component-container">
 
             <!-- Final result switch --> 
             <template if="{{component}}"> 
@@ -135,6 +131,13 @@
               <core-icon icon="device:signal-cellular-0-bar" class="resize"  draggable="true"  on-dragStart="{{dragResizeStart}}" on-drag="{{dragResize}}" on-dragEnd="{{dragResizeEnd}}"></core-icon>  
             </div>          
           </div>
+          <!-- Data Table -->
+          <div id="data-container">
+            <!-- Filter Options<lens-data-filter input="{{input}}" output="{{filterOutput}}"></lens-data-filter> -->
+            <lens-data-table id="inputTable" input="{{filterOutput || input}}" output="{{componentData}}"></lens-data-table>
+          </div>
+
+         
         </template>
 
       </template>
