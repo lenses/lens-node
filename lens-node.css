@@ -1,4 +1,6 @@
 
+
+
 #node{ /* main container */
   width: 100%;
   background-color: white;
@@ -91,4 +93,25 @@ paper-toggle-button::shadow [checked] .toggle-ink {
   color: white;
   cursor: pointer;
   z-index: 1001;
+}
+label {
+  display: block;
+  color: #2fa3af;
+}
+
+
+.selector {
+  min-height: 10px;
+  display: inline-block;
+  max-height: 123px;
+  overflow-y: scroll; 
+}
+
+.selector .col {
+  padding: 1px;
+  border: 1px solid #EEE;
+}
+.selector .core-selected {
+  background-color: #ccc;
+
 }
