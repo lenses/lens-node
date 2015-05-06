@@ -8,7 +8,7 @@
 <link rel="import" href="../lens-data-filter/lens-data-filter.html">
 <link rel="import" href="../lens-u-options-editor/lens-u-options-editor.html">
 
-<polymer-element name="lens-node" attributes="input output componentList type finalResult">
+<polymer-element name="lens-node" attributes="input output componentList type finalResult dataSetIndex">
     <core-style ref="theme"></theme>
     <template>
     <link rel="stylesheet" href="lens-node.css">
@@ -69,7 +69,7 @@
         <template if="{{type==='join'}}">
 
           <!-- Choose track -->
-          <label class="label" for="func_selector">Track to join:</label>
+          <label class="label" for="func_selector">Select which track to join:</label>
           <core-selector class="selector" id="track-selector" selected="{{dataSetIndex}}" valueattr="label">
             <template repeat="{{dataset, index in dataSets}}">
               <template if="{{dataset}}">
@@ -234,9 +234,9 @@
           self.componentName = selection.label
           self.setComponentObserver(); // observe changes to output of component
         })
-        if(self.type == "join"){
-          self.getDatasets();
-        }
+        // if(self.type == "join"){
+        //   self.getDatasets();
+        // }
         
       },
       /**
@@ -346,6 +346,14 @@
         // If data in a previous node changes, it should flow through all visual nodes
         if(self.type=="visualize"){
           self.output = self.cloneArray(self.input);
+        }
+
+        if(self.component && self.type != 'input'){
+          self.component.input = self.input;
+        }
+
+        if (self.type == 'join'){
+          self.getDatasets();
         }
       },
       /**
@@ -462,12 +470,25 @@
         var tracks = self.parentNode.tracks;
 
         self.dataSets = tracks.map(function(track){
-          return track[track.length-1].tag.output;
+          
+          var thisTrack = false;
+          track.forEach(function(node){
+            if (node.id === self.id) {
+              thisTrack = true;
+            }
+          })
+          if (thisTrack){
+            return undefined;
+          } else {
+            console.log("data", track[track.length-1].tag.output);
+            return track[track.length-1].tag.output;
+          }
         })
 
-        console.log(self.dataSets);
+        console.log("datasets", self.dataSets);
       },
       dataSetIndexChanged: function(){
+        this.getDatasets();
         this.component.input_aux = this.dataSets[this.dataSetIndex];
       }
         
