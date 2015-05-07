@@ -8,7 +8,7 @@
 <link rel="import" href="../lens-data-filter/lens-data-filter.html">
 <link rel="import" href="../lens-u-options-editor/lens-u-options-editor.html">
 
-<polymer-element name="lens-node" attributes="input output componentList type finalResult dataSetIndex">
+<polymer-element name="lens-node" attributes="type finalResult trackIndex">
     <core-style ref="theme"></theme>
     <template>
     <link rel="stylesheet" href="lens-node.css">
@@ -70,7 +70,7 @@
 
           <!-- Choose track -->
           <label class="label" for="func_selector">Select which track to join:</label>
-          <core-selector class="selector" id="track-selector" selected="{{dataSetIndex}}" valueattr="label">
+          <core-selector class="selector" id="track-selector" selected="{{trackIndex}}" valueattr="label">
             <template repeat="{{dataset, index in dataSets}}">
               <template if="{{dataset}}">
                 <div class="col" label="{{index}}">Track {{index+1}}</div>
@@ -198,6 +198,7 @@
        */
       showOptions: false,
       componentOutput: [],
+      trackIndex: 0,
       domReady: function() {
         var self = this;
         self.fire('dom-ready');
@@ -234,9 +235,9 @@
           self.componentName = selection.label
           self.setComponentObserver(); // observe changes to output of component
         })
-        // if(self.type == "join"){
-        //   self.getDatasets();
-        // }
+        if(self.type == "join"){
+          self.getDatasets();
+        }
         
       },
       /**
@@ -487,9 +488,9 @@
 
         console.log("datasets", self.dataSets);
       },
-      dataSetIndexChanged: function(){
+      trackIndexChanged: function(){
         this.getDatasets();
-        this.component.input_aux = this.dataSets[this.dataSetIndex];
+        this.component.input_aux = this.dataSets[this.trackIndex];
       }
         
     });
