@@ -1,71 +1,62 @@
-#node{
+
+
+
+#node{ /* main container */
   width: 100%;
-  /*min-height: 100px;*/
-  
   background-color: white;
   margin: 0 auto;
   box-sizing: border-box;
   padding: 0;
-  /*border: 3px solid #eee;*/
   border-radius: 5px;
 }
 
-#select, #transform {
-  /*min-height: 200px;*/
+.heading {
+  color: black;
+  font-weight: 600;
+  padding: 5px;
+  text-align: center;
+}
+
+#data-container { 
   border-bottom: 3px solid #eee;
   padding: 5px;
 }
 
-#view {
+#component-container {
   padding: 5px;
 }
 
-#chartcontainer {
+#chart-container {
   position: relative;
   width: 100%;
   overflow-x: hidden;
+}
+
+.optionsContainer {
+  margin-left: 0;
+  width: 300px;
+  height: 100%;
+  position: absolute;
+  transition: 1s;
+  z-index: 1001;
+}
+
+core-item { /* component icon within list of components */
+  margin: 0 5px;
 }
 
 core-item::shadow #label{
   padding: 5px;
   background-color: #eee;
   cursor: pointer;
+  display: inline-block;
 }
 
-.heading {
-  color: white;
-  font-weight: 600;
-  padding: 5px;
-}
-.input {
-  border: 3px solid #91CAFA;
-}
-
-.input-background {
-  background-color: #91CAFA;
-}
-
-.transform {
-  border: 3px solid #43A0BA;
-}
-
-.transform-background {
-  background-color: #43A0BA;
-}
-
-.visualize {
-  border: 3px solid #536482;
-}
-
-.visualize-background {
-  background-color: #536482;
-}
-
-#toggle {
+#toggle { /* final result switch */
   float: right;
 }
 
-.toggle-text {
+.toggle-text { /* text next to final result switch */
   float: right;
   margin: 0px 5px;
 }
@@ -78,7 +69,7 @@ paper-toggle-button::shadow [checked] .toggle-ink {
   color: #536482;
 }
 
-.resize {
+.resize { /* resize icon in visual node */
   position: absolute;
   right: -3px;
   bottom: -3px;
@@ -87,16 +78,7 @@ paper-toggle-button::shadow [checked] .toggle-ink {
   cursor: s-resize;
 }
 
-.optionsContainer {
-  margin-left: 0;
-  width: 300px;
-  height: 100%;
-  position: absolute;
-  transition: 1s;
-  z-index: 1001;
-}
-
-.closed {
+.closed { /*  */
   transition: 1s;
   margin-left: -300px;
 }
@@ -111,4 +93,25 @@ paper-toggle-button::shadow [checked] .toggle-ink {
   color: white;
   cursor: pointer;
   z-index: 1001;
+}
+label {
+  display: block;
+  color: #2fa3af;
+}
+
+
+.selector {
+  min-height: 10px;
+  display: inline-block;
+  max-height: 123px;
+  overflow-y: scroll; 
+}
+
+.selector .col {
+  padding: 1px;
+  border: 1px solid #EEE;
+}
+.selector .core-selected {
+  background-color: #ccc;
+
 }

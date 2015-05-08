@@ -5,269 +5,253 @@
 <link rel="import" href="../core-icons/core-icons.html">
 <link rel="import" href="../core-icons/device-icons.html">
 <link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
-<link rel="import" href="../core-collapse/core-collapse.html">
 <link rel="import" href="../lens-data-filter/lens-data-filter.html">
-<link rel="import" href="../th-data-selector/th-data-selector.html">
 <link rel="import" href="../lens-u-options-editor/lens-u-options-editor.html">
 
-<polymer-element name="lens-node" attributes="input output componentList type pathToComponents finalResult">
+<polymer-element name="lens-node" attributes="type finalResult trackIndex">
     <core-style ref="theme"></theme>
     <template>
     <link rel="stylesheet" href="lens-node.css">
 
     <div id="node" class="{{type}}">
-      <!-- Common among all nodes -->
       
-      <!-------------------------------- INPUT NODE -------------------------------->
-      <template if="{{type==='input'}}">
-        <div class="heading input-background">
-          <template if="{{!componentName}}"> Data Input </template>
-          <template if="{{componentName}}"> {{componentName}} </template>
-        </div>
-        <div id="view">
-
-          Choose data source:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
-          <core-collapse id="collapse-view" opened>
-            <!-- Name of component selected -->
-            <template if="{{component}}">
-              <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
-            </template>
-          
-            <!-- Menu of components to choose from -->
-            <template if="{{!component}}">  
-              
-              <core-menu id="component-list">
-                <template repeat="{{component in componentList | filterByType}}">
-                  <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
-                </template>
-              </core-menu>
-            </template>
+      <!-- COMMON AMONG ALL NODES: Display component list if no component selected -->
+      <template if="{{!component}}">
+        <core-menu id="component-list" horizontal layout wrap>
+          <template repeat="{{component in componentList}}">
+            <core-item class="{{component.name}}" on-click="{{addNewElement}}" label="{{component.friendly}}" data-node-type="{{component.type}}"></core-item>
+          </template>
+        </core-menu>
+      </template>
+      
+      <template if="{{component}}">
+        <!-- Heading -->
+        <div class="heading">{{componentName}}</div>
         
-            <!-- Component itself -->
+        <!-------------------------------- INPUT NODE -------------------------------->
+        <template if="{{type==='input'}}">
+                   
+          <!-- Component itself -->
+          <div id="component-container">
             <content id="component"></content>
-          </core-collapse>
-
-        </div>
-      </template>
-
-      <!-------------------------------- TRANSFORM NODE -------------------------------->
-      <template if="{{type==='transform'}}">
-        <div class="heading transform-background"> 
-          <template if="{{!componentName}}"> Transform Data </template>
-          <template if="{{componentName}}"> {{componentName}} </template>
-        </div>
-        <div id="select">
-          
-          <!-- INPUT TABLE --> 
-          Data: <core-icon icon="menu" data-target="collapse-select" on-click="{{toggleCollapse}}"></core-icon>
-          <core-collapse id="collapse-select">
-            <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{filterOutput || input}}" output="{{data}}"></lens-data-table>
-          </core-collapse>
-        </div>
-        
-        <!-- COMPONENT --> 
-        <div id="transform">
-          Transform:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-transform"></core-icon>
-          <!-- *** Collapsible *** -->
-            <core-collapse id="collapse-transform">
-              <!-- Name of component selected -->
-              <template if="{{component}}">
-                <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item>
-              </template>
-
-              <!-- Menu of components to choose from -->
-              <template if="{{!component}}">
-                <core-menu id="component-list">
-                    <!-- <core-item class="core-selected" label="None"></core-item> -->
-                  <template repeat="{{component in componentList | filterByType}}">
-                    <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
-                  </template>
-                </core-menu>
-              </template>
-
-              <!-- Component itself -->
-              <content id="component"></content>
-            </core-collapse>
-          <!-- ***** -->
-        </div>
-        
-        <!-- OUTPUT TABLE --> 
-        <div id="view">
-          Result (read only)<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon>
-          <core-collapse id="collapse-view">
-            <lens-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" output="{{output}}"  readOnly="true"></lens-data-table>
-          </core-collapse>
-        </div>
-      </template>
-
-      <!-------------------------------- VISUALIZE NODE -------------------------------->
-      <template if="{{type==='visualize'}}">
-        <div class="heading visualize-background"> 
-          <template if="{{!componentName}}"> Visualize Data </template>
-          <template if="{{componentName}}"> {{componentName}} </template>
-        </div>
-        <div id="select">
-          Data:<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-select"></core-icon>
-          
-          <core-collapse id="collapse-select">
-            <!-- Filter Options<lens-data-filter input="{{input}}" output="{{filterOutput}}"></lens-data-filter> -->
-            <lens-data-table id="inputTable" input="{{filterOutput || input}}" output="{{data}}"></lens-data-table>
-            
-            <template if="{{showDataSelector}}">  
-              <th-data-selector id="dataselector" input="{{data}}" dataFields="{{fields}}" output="{{selectedData}}"></th-data-selector>
-            </template>
-            
-          </core-collapse>
-        </div>
-
-        <div id="view">
-           <!--<core-icon icon="menu" on-click="{{toggleCollapse}}" data-target="collapse-view"></core-icon> -->
-          <template if="{{component}}"> 
-            <template if="{{finalResult}}">
-              <paper-toggle-button id="toggle" checked="true" on-click="{{deselectFinalResult}}" ></paper-toggle-button><span class="toggle-text">Selected </span>
-            </template>
-            <template if="{{!finalResult}}">
-              <paper-toggle-button id="toggle" checked="false" on-click="{{selectFinalResult}}" ></paper-toggle-button><span class="toggle-text">Select as final result? </span>
-            </template>
-            
-
-          </template>
-          <core-collapse id="collapse-view" opened>
-            
-            <!-- Name of component selected -->
-            <template if="{{component}}">
-              <core-item label="{{componentName}}"> <core-icon icon="clear" on-click="{{removeElement}}"> </core-icon>   </core-item> 
-            </template>
-            
-            <!-- Menu of components to choose from -->
-            <template if="{{!component}}">
-            Choose a visual:  
-              <core-menu id="component-list">
-                <template repeat="{{component in componentList | filterByType}}">
-                  <core-item class="{{component.name}}" on-click="{{addElement}}" label="{{component.friendly}}"></core-item>
-                </template>
-              </core-menu>
-            </template>
-          
-          </core-collapse>
-          <template if="{{component}}">  
-          <div id="chartcontainer" style="height:{{component | heightFilter }};">
-            <div id="optionsContainer" class="optionsContainer closed" style="display: {{component | optionsDisplayFilter}}">
-              <template if="{{!menuOpened}}">
-                <core-icon id="open" on-click="{{openOptions}}" icon="chevron-right"></core-icon>
-              </template>
-              <template if="{{menuOpened}}">
-                <core-icon id="close" on-click="{{closeOptions}}" icon="chevron-left"></core-icon>
-              </template>
-              <lens-u-options-editor id="options" options="{{component | getMetaData }}" on-th-options-changed="{{componentOptionsChanged}}" selections="{{componentOptions}}"></lens-u-options-editor>
-            </div>
-              
-            
-            <!-- Component itself -->
-            <content id="component"></content>  
-            <core-icon icon="device:signal-cellular-0-bar" class="resize"  draggable="true"  on-dragStart="{{dragResizeStart}}" on-drag="{{dragResize}}" on-dragEnd="{{dragResizeEnd}}"></core-icon>  
           </div>
+          
+          <!-- Data Table -->
+          <template if="{{component.tagName != 'LENS-DATA-TABLE' && componentOutput.length}}">
+            <div id="data-container">
+              <lens-data-table id="outputTable"  firstRowIsHeader="{{firstRow}}" input="{{componentOutput}}" output="{{output}}" ></lens-data-table>
+            </div>
           </template>
-        </div>
+ 
+        </template>
+
+        <!-------------------------------- TRANSFORM NODE -------------------------------->
+        <template if="{{type==='transform'}}">
+
+          <!-- Component itself --> 
+          <div id="component-container">
+            <content id="component"></content>
+          </div>
+
+          <!-- Data table (input & output) --> 
+          <div id="data-container">
+            <template if="{{!showOutput}}">
+              <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{input}}" output="{{componentData}}"></lens-data-table>
+            </template>
+            <template if="{{showOutput}}">
+              <lens-data-table id="outputTable" firstRowIsHeader="{{firstRow}}" input="{{componentOutput}}" output="{{output}}" ></lens-data-table>
+            </template>
+          </div>
+
+        </template>
+
+        <!-------------------------------- JOIN NODE -------------------------------->
+        <template if="{{type==='join'}}">
+
+          <!-- Choose track -->
+          <label class="label" for="func_selector">Select which track to join:</label>
+          <core-selector class="selector" id="track-selector" selected="{{trackIndex}}" valueattr="label">
+            <template repeat="{{dataset, index in dataSets}}">
+              <template if="{{dataset}}">
+                <div class="col" label="{{index}}">Track {{index+1}}</div>
+              </template>
+            </template>
+          </core-selector>
+
+          <!-- Component itself --> 
+          <div id="component-container">
+            <content id="component"></content>
+          </div>
+
+          <!-- Data table (input & output) --> 
+          <div id="data-container">
+            <template if="{{!showOutput}}">
+              <lens-data-table id="inputTable" firstRowIsHeader="{{firstRow}}" input="{{input}}" output="{{componentData}}"></lens-data-table>
+            </template>
+            <template if="{{showOutput}}">
+              <lens-data-table id="outputTable" firstRowIsHeader="{{firstRow}}" input="{{componentOutput}}" output="{{output}}" ></lens-data-table>
+            </template>
+          </div>
+
+        </template>
+
+
+        <!-------------------------------- VISUALIZE NODE -------------------------------->
+        <template if="{{type==='visualize'}}">
+           <div id="component-container">
+
+            <!-- Final result switch --> 
+            <template if="{{component}}"> 
+              <template if="{{finalResult}}">
+                <paper-toggle-button id="toggle" checked="true" on-click="{{deselectFinalResult}}" ></paper-toggle-button><span class="toggle-text">Selected </span>
+              </template>
+              <template if="{{!finalResult}}">
+                <paper-toggle-button id="toggle" checked="false" on-click="{{selectFinalResult}}" ></paper-toggle-button><span class="toggle-text">Select as final result? </span>
+              </template>
+            </template>
+
+            <!-- Options editor and component --> 
+            <div id="chart-container" style="height:{{component | heightFilter }};">
+
+              <!-- Options editor -->
+              <div id="optionsContainer" class="optionsContainer closed" style="display: {{component | optionsDisplayFilter}}">
+                <template if="{{!showOptions}}">
+                  <core-icon id="open" on-click="{{openOptions}}" icon="chevron-right"></core-icon>
+                </template>
+                <template if="{{showOptions}}">
+                  <core-icon id="close" on-click="{{closeOptions}}" icon="chevron-left"></core-icon>
+                </template>
+                <lens-u-options-editor id="options" options="{{component | getMetaData }}" on-th-options-changed="{{componentOptionsChanged}}" selections="{{componentOptions}}"></lens-u-options-editor>
+              </div>
+                
+              <!-- Component itself -->
+              <content id="component"></content>  
+
+              <!-- Resize icon -->
+              <core-icon icon="device:signal-cellular-0-bar" class="resize"  draggable="true"  on-dragStart="{{dragResizeStart}}" on-drag="{{dragResize}}" on-dragEnd="{{dragResizeEnd}}"></core-icon>  
+            </div>          
+          </div>
+          <!-- Data Table -->
+          <div id="data-container">
+            <!-- Filter Options<lens-data-filter input="{{input}}" output="{{filterOutput}}"></lens-data-filter> -->
+            <lens-data-table id="inputTable" input="{{filterOutput || input}}" output="{{componentData}}"></lens-data-table>
+          </div>
+
+         
+        </template>
 
       </template>
-      
     </div>
   </template>
 
   <script>
     Polymer('lens-node', {
-      componentOutput: [],
       /**
-       * 'type' can be 'input', 'transform', or 'visualize', referring to the type of component the node should be able to process
-       * @type {String}
+       * Input data
+       *
+       * @property input
+       * @type array of objects
+       * @default undefined
+       */
+
+      /**
+       * Output data
+       *
+       * @property output
+       * @type object
+       * @default undefined
+       */
+      
+      /**
+       * Type of node
+       * Options are:
+       *   - 'input'
+       *   - 'transform'
+       *   - 'visualize'
+       *
+       * @property type
+       * @type array of objects
+       * @default undefined
+       */
+      
+      /**
+       * Component List
+       *
+       * @property componentList
+       * @type array of objects
+       * @default undefined
+       */
+      
+      /**
+       * Final Result is a boolean that flags the component in the node as the final result (only applicable to visualize nodes)
+       * 
+       * @property finalResult
+       * @type {Boolean}
+       * @default false
        */
       finalResult: false,
-      type: 'transform',
       /**
-       * 'pathToComponents' is the path to the directory of components that might be added in, used for dynamically adding HTML imports
-       * @type {String}
+       * Show Options is a boolean that informs whether or not the component options are visible (only applicable to visual nodes)
+       * 
+       * @property showOptions
+       * @type {Boolean}
        */
-      pathToComponents: '../',
-      menuOpened: false,
-      /**
-       * 'componentList' list of components that can be added to any type of node
-       * @type {Array}
-       * @properties: name, friendly, type
-       */
-      componentList: [
-          {name:'lens-data-table', friendly: 'Data table', type: 'input'},
-          {name: 'lens-input-simple-api', friendly: 'API Data Loader', type: 'input'},
-          {name:'lens-input-csv', friendly: 'CSV Loader', type: 'input'},
-          {name: 'lens-input-enigma', friendly: 'Enigma Data Loader', type: 'input'},
-          
-          {name:'lens-data-convert-date', friendly: 'Convert Dates', type: 'transform'},
-          {name:'lens-data-geocoder-firebase', friendly: 'Geocodes for Map', type: 'transform'},
-          {name:'lens-data-groupby', friendly: 'Group Data', type: 'transform'},
-          {name:'lens-data-filter', friendly: 'Filter Data', type: 'transform'},
-          {name:'lens-data-sort', friendly: 'Sort Data', type: 'transform'},
-          {name:'lens-data-split', friendly: 'Split Column', type: 'transform'},
-          {name:'lens-data-join', friendly: 'Join Columns', type: 'transform'},
-          {name:'lens-data-formula', friendly: 'Math & Trig Functions', type: 'transform'},
-          {name:'lens-data-array-func', friendly: 'Map/Reduce Function (JavaScript)', type: 'transform'},
-
-          {name:'lens-viz-am-combo-chart', friendly: 'Bar/Line Combo Chart', type: 'visualize'},
-          {name:'lens-viz-g-map', friendly: 'Google Map', type: 'visualize'},
-          {name:'lens-viz-mapbox', friendly: 'Mapbox Map', type: 'visualize'},
-          {name:'lens-viz-g-bar-chart', friendly: 'Google Bar Chart', type: 'visualize'},
-          {name:'lens-viz-g-line-chart', friendly: 'Google Line Graph', type: 'visualize'},
-          {name:'lens-viz-g-scatter-bubble', friendly: 'Google Bubble Chart', type: 'visualize'},
-          {name:'lens-viz-g-pie-chart', friendly: 'Google Pie Chart', type: 'visualize'},
-          {name:'lens-viz-line-chart-touch', friendly: 'Thelma Line Chart', type: 'visualize'},
-          {name:'lens-viz-bar-chart-horizontal', friendly: 'Thelma Horizontal Bar Chart', type: 'visualize'},
-          {name:'lens-viz-bar-chart', friendly: 'Thelma Bar Chart', type: 'visualize'}
-      ],
+      showOptions: false,
+      componentOutput: [],
+      trackIndex: 0,
       domReady: function() {
         var self = this;
         self.fire('dom-ready');
-        // Find the child component if exists
-        self.component = self.$.component.getDistributedNodes()[1];
+        
+        // Find the child component if they exist
+        self.component = self.$.component ? self.$.component.getDistributedNodes()[1] : null;
       },
       /**
-       * 'addElement' callback to when an element is clicked on; element is imported, initialized and appended to the DOM
+       * 'addNewElement' callback to when an element is clicked on; element is imported, initialized and appended to the DOM
        * @param {[type]} 'selection' is the element clicked 
        */
-      addElement: function(e, detail, selection){
+      addNewElement: function(e, detail, selection){
         var self = this,
             name = selection.className,
-            directory = self.pathToComponents + name + "/" + name + ".html",
+            directory =  "../" + name + "/" + name + ".html",
             pathToEl = this.resolvePath(directory); // construct path to component
-
+        
+        // Set node type based on component selected
+        self.type = selection.dataset.nodeType;
         
         // Dynamically create HTML import for component
         Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
           self.component = document.createElement(name);
-          if (self.type !=="input"){ // if the component is visual, set the input to the data selector output if avail, otherwise the table data
+          if (self.type !=="input"){ 
             self.component.style.height = "100%";
             self.component.style.width = "100%";
-            self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
-          } 
-            // if (self.component){
-          // self.component.animateOnInit = true;
-          // self.component.style.width = "100%";
-          // self.getFieldsFromComponent();
-          // self.component.input = self.cloneArray(self.selectedData) || self.cloneArray(self.data);
-        // }
+            self.component.input = self.cloneArray(self.componentData);
+
+          } else {
+            self.component.input = [[]];
+          }
 
           self.appendChild(self.component);
           self.componentName = selection.label
           self.setComponentObserver(); // observe changes to output of component
         })
+        if(self.type == "join"){
+          self.getDatasets();
+        }
         
       },
+      /**
+       * 'createElementFromSavedData' creates a component given the name of the element and an object of attributes and values
+       * @param  {String} name  example: 'lens-input-csv'
+       * @param  {Object} attrs 
+       */
       createElementFromSavedData: function(name, attrs){
         var self = this,
-            directory = self.pathToComponents + name + "/" + name + ".html",
+            directory = "../" + name + "/" + name + ".html",
             pathToEl = this.resolvePath(directory); // construct path to component
 
         self.addEventListener('dom-ready', function(){
-
-          Polymer.import([pathToEl], function(){ // TODO: this path is different in the lenscomposer app -- doesnt point to bower_components directory
+          Polymer.import([pathToEl], function(){
             self.component = document.createElement(name);
             self.component.style.height = "100%";
             self.component.style.width = "100%";
@@ -282,19 +266,6 @@
             self.setComponentObserver(); // observe changes to output of component
           })        
         })
-
-      },
-      /**
-       * removeElement removes the component from the page 
-       * @param {[type]} 'selection' is the element clicked 
-       */
-      removeElement: function(e, detail, selection){
-        var self = this;
-        self.removeChild(self.component);
-        self.component = null;
-        self.componentName = null;
-        self.componentOptions = {};
-        
       },
       /**
        * 'cloneArray' If argument is an array, it returns a clone of it, otherwise returns undefined
@@ -304,83 +275,37 @@
       cloneArray: function(arr){
         return arr && arr.constructor === Array ?  [].map.call(arr, function(item){ return item; }) : undefined;
       },
-      componentChanged: function(){
-        var self = this;
-        if (self.component){
-          self.component.animateOnInit = true;
-          self.component.style.width = "100%";
-          self.getFieldsFromComponent();
-          if (self.type === 'visualize') {
-            self.component.input = self.data; // recent add on - sometimes the chart was not getting any input
-          }
-          
-        } else {
-          switch(self.type){
-            case "input":
-              self.output = self.cloneArray(self.input);
-              break;
-            case "transform":
-              self.$.outputTable.input = self.cloneArray(self.data);
-              break;
-            default:
-              break;
-          }
-        }
-      },
       /**
        * 'setComponentObserver' sets up an observer for changes in the output of the component and binds the new value to componentOutput
        */
       setComponentObserver: function(){
         var self = this;
+
         var componentOutputObserver = new PathObserver(self.component, 'output').open(function(newValue, oldValue){
+          
+          // If the input is different than component output, set showOutput to true to switch which data is displayed in the table
+          var inputStr = JSON.stringify(self.input);
+          var outputStr = JSON.stringify(self.component.output);
+          if (inputStr != outputStr){
+            self.showOutput = true;
+          }
           self.componentOutput = self.component.output;    
         })
-
-
       },
       /**
-       * filterByType is a filter for the componentList, to show only the available component options for a particular type of node
+       * 'componentDataChanged' is an observer for the input data to a component in transform and visual nodes
        */
-      filterByType: function(value){
-        var self = this;
-        var componentList = value.filter(function(component){ return component.type === self.type });
-        return componentList;
-      },
-      /**
-       * 'getFieldsFromComponent' 
-       * @return {[type]} [description]
-       */
-      getFieldsFromComponent: function(){
-        var self = this;
-        if (self.component && self.component.getMetaData){
-          // DISABLE WHILE WORKING ON OPTIONS EDITOR
-          // self.showDataSelector = true; 
-          // var metadata = self.component.getMetaData();
-          // self.fields = metadata.fields || metadata.inputAttr.chartData.fields;
-        } else {
-          self.showDataSelector = false;
-        }
-      },
-      /**
-       * 'dataChanged' is an observer for output of input data table
-       */
-      dataChanged: function(){
+      componentDataChanged: function(){
           var self = this;
 
-          // If there's a component (and data in the table)
-          if (self.component && self.data.length > 0){
-            // Pass data through selector before hitting component, if necessary
-            if(self.showDataSelector){
-              self.$.dataselector.input = self.cloneArray(self.data);
-          
-            // Otherwise send it straight through component
-            } else {
-              self.component.input = self.cloneArray(self.data);
-            }
-
+          // If there's a component and data in the table
+          if (self.component && self.componentData.length > 0){
+            // set the component input to that data
+            self.component.input = self.cloneArray(self.componentData);
+            
           // Otherwise bind any data in the input table straight to the output table 
           } else if (self.$.outputTable && !self.component){
-            self.$.outputTable.input = self.cloneArray(self.data);
+            self.$.outputTable.input = self.cloneArray(self.componentData);
           }
 
           // Set output of visual node 
@@ -389,23 +314,23 @@
           }
       },
       /**
-       * 'selectedDataChanged' is an observer for output of data selector 
-       */
-      selectedDataChanged: function(newValue, oldValue){
-        var self = this;
-        self.component.input = self.cloneArray(newValue);
-      },
-      /**
        * 'componentOutputChanged' is an observer for output of the component
        */
       componentOutputChanged: function(){
         var self = this;
         if (self.type === "input") {
           self.output = self.cloneArray(self.componentOutput);
-        } else if (self.type === "transform"){
-          self.$.outputTable.input = self.cloneArray(self.componentOutput);
+        } else if (self.type === "transform" || self.type === "join"){
+          var inputStr = JSON.stringify(self.input);
+          var outputStr = JSON.stringify(self.componentOutput);
+          if (inputStr != outputStr){
+            self.showOutput = true;
+          }
         }
       },
+      /**
+       * 'componentOptionsChanged' is an observer that reassigns the component options to the component when they change
+       */
       componentOptionsChanged: function(){
         var self = this;
         if (self.component){
@@ -419,20 +344,18 @@
        */
       inputChanged: function(){
         var self = this;
-        // If data in a previous node changes, it should flow through to all visual nodes
-        // Set output of visual node 
+        // If data in a previous node changes, it should flow through all visual nodes
         if(self.type=="visualize"){
           self.output = self.cloneArray(self.input);
         }
-      },
-      /**
-       * 'toggleCollapse' toggles the collapse state of the selection
-       */
-      toggleCollapse: function(e, detail, selection){
-        var self = this;
-        var target = selection.dataset.target;        
-        e.stopPropagation();
-        self.shadowRoot.querySelector('#'+target).toggle();
+
+        if(self.component && self.type != 'input'){
+          self.component.input = self.input;
+        }
+
+        if (self.type == 'join'){
+          self.getDatasets();
+        }
       },
       /**
        * 'selectFinalResult' callback to when the final result switch for a particular graph is clicked. 
@@ -456,14 +379,15 @@
         self.startY = e.y;
       },
       dragResize: function(e, detail, selection){
-        var self = this;
-        var movement = e.y - self.startY;
+        var self = this,
+            movement = e.y - self.startY;
+
         selection.parentNode.style.height = self.chartHeight + movement + 'px';
-      
       },
       dragResizeEnd: function(e, detail, selection){
-        var self = this;
-        var movement = e.y - self.startY; 
+        var self = this,
+            movement = e.y - self.startY; 
+
         selection.parentNode.style.height = self.chartHeight + movement + 'px';
         self.component.resize();
       },
@@ -495,15 +419,78 @@
       },
       openOptions: function(){
         var self = this;
-        self.menuOpened = true;
-        // console.log(self.shadowRoot.querySelector());
+        self.showOptions = true;
         self.shadowRoot.querySelector('#optionsContainer').classList.remove('closed');
-
       },
       closeOptions: function(){
         var self = this;
-        self.menuOpened = false;
+        self.showOptions = false;
         self.shadowRoot.querySelector('#optionsContainer').classList.add('closed');
+      },
+      
+      //***  NOT IN USE ***//
+
+      /**
+       * 'componentChanged' is an observer for the component attr
+       */
+      componentChanged: function(){
+        var self = this;
+        if (self.component){
+          // self.component.animateOnInit = true;
+          // self.component.style.width = "100%";
+          // if (self.type === 'visualize') {
+          //   self.component.input = self.componentData; // recent add on - sometimes the chart was not getting any input
+          // }
+          
+        } else {
+          switch(self.type){
+            case "input":
+              // self.output = self.cloneArray(self.input);
+              break;
+            case "transform":
+              // self.$.outputTable.input = self.cloneArray(self.componentData);
+              break;
+            default:
+              break;
+          }
+        }
+      },
+      /**
+       * 'removeElement' removes the component from the node 
+       */
+      removeElement: function(){
+        var self = this;
+        self.removeChild(self.component);
+        self.component = null;
+        self.componentName = null;
+        self.componentOptions = {};
+        self.componentOutput = [];
+      },
+      getDatasets: function(){
+        var self = this;
+        var tracks = self.parentNode.tracks;
+
+        self.dataSets = tracks.map(function(track){
+          
+          var thisTrack = false;
+          track.forEach(function(node){
+            if (node.id === self.id) {
+              thisTrack = true;
+            }
+          })
+          if (thisTrack){
+            return undefined;
+          } else {
+            console.log("data", track[track.length-1].tag.output);
+            return track[track.length-1].tag.output;
+          }
+        })
+
+        console.log("datasets", self.dataSets);
+      },
+      trackIndexChanged: function(){
+        this.getDatasets();
+        this.component.input_aux = this.dataSets[this.trackIndex];
       }
         
     });
