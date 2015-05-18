@@ -69,7 +69,7 @@
         <template if="{{type==='join'}}">
 
           <!-- Choose track -->
-          <label class="label" for="func_selector">Select which track to join:</label>
+          <label class="label" for="func_selector">Select which track to join with: <br> (Note: This version only supports joining with tracks to the left)</label>
           <core-selector class="selector" id="track-selector" selected="{{trackIndex}}" valueattr="label">
             <template repeat="{{dataset, index in dataSets}}">
               <template if="{{dataset}}">
@@ -473,15 +473,18 @@
       getDatasets: function(){
         var self = this;
         var tracks = self.parentNode.tracks;
+        var thisTrack;
 
         self.dataSets = tracks.map(function(track){
           
-          var thisTrack = false;
+          // var thisTrack = false; 
           track.forEach(function(node){
             if (node.id === self.id) {
               thisTrack = true;
             }
           })
+
+          // Note: Updated to only show datasets on previous tracks. Once the current track is hit, it returns undefined for subsequent datasets
           if (thisTrack){
             return undefined;
           } else {
