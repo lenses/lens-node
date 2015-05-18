@@ -17,6 +17,21 @@
   font-size: 0.85em;
 }
 
+.notes paper-input {
+  width: 100%;
+}
+
+
+/* restyle paper input */
+:host /deep/ paper-input-decorator { /* remove padding from paper-input */
+  padding: 0px 10px;
+}
+
+
+paper-input /deep/ #underline > * { /* removes underline from all paper-input */
+  background: none;
+}
+
 #data-container { 
   padding: 5px;
   border-top: 3px solid #eee;

@@ -8,7 +8,7 @@
 <link rel="import" href="../lens-data-filter/lens-data-filter.html">
 <link rel="import" href="../lens-u-options-editor/lens-u-options-editor.html">
 
-<polymer-element name="lens-node" attributes="type finalResult trackIndex">
+<polymer-element name="lens-node" attributes="type finalResult trackIndex notes">
     <core-style ref="theme"></theme>
     <template>
     <link rel="stylesheet" href="lens-node.css">
@@ -27,7 +27,8 @@
       <template if="{{component}}">
         <!-- Heading -->
         <div class="heading">{{componentName}}</div>
-        
+        <div class="notes"><paper-input label="Jot down some explanatory notes here." value="{{notes}}"></paper-input></div>
+
         <!-------------------------------- INPUT NODE -------------------------------->
         <template if="{{type==='input'}}">
                    
