@@ -12,6 +12,8 @@
   font-weight: 600;
   padding: 5px;
   text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 #data-container { 
@@ -21,7 +23,6 @@
 
 #component-container {
   padding: 5px;
-  
 }
 
 #chart-container {

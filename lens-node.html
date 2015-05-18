@@ -198,7 +198,7 @@
        */
       showOptions: false,
       componentOutput: [],
-      trackIndex: 0,
+      trackIndex: -1,
       domReady: function() {
         var self = this;
         self.fire('dom-ready');
@@ -288,6 +288,10 @@
           var outputStr = JSON.stringify(self.component.output);
           if (inputStr != outputStr){
             self.showOutput = true;
+
+            if (self.type === 'join'){
+              self.fire('lens-join', { joinToNodeId: self.id, joinFromTrackIndex: self.trackIndex});
+            }
           }
           self.componentOutput = self.component.output;    
         })
