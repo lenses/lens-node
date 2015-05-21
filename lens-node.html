@@ -499,6 +499,9 @@
       trackIndexChanged: function(){
         this.getDatasets();
         this.component.input_aux = this.dataSets[this.trackIndex];
+      },
+      outputChanged: function(){
+        this.fire('lens-node-output-changed');
       }
         
     });
